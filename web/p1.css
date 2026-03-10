@@ -1,0 +1,139 @@
+*{
+    margin: 8;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    background-color: rgb(248, 237, 248);
+    min-height: auto;
+    font-family:'Courier New', Courier, monospace;
+    display:flex;
+    flex-direction: column;
+
+}
+.n1{
+
+    display: inline;
+    justify-content: space-around;
+    background: rgb(209, 163, 163);
+    padding: 1rem 2 rem;
+    box-shadow: inset;
+    flex-wrap: wrap;
+}
+.logo a{
+    font-size: 1.6rem;
+    text-decoration: none;
+    font-weight: 500;
+    color: #000;
+
+}
+.n1-link{
+    display: flex;
+    gap: 3rem;
+    list-style: none;
+      
+
+}
+.n1-link a{
+    text-decoration: none;
+    color: rgb(23, 94, 156);
+    font-weight: 400;
+    border-bottom: 2px solid transparent;
+    padding: 0.5rem;
+
+}
+
+.n1-link a:hover{
+    color: rgb(178, 197, 241);
+    border-bottom-color: #1a73e8;
+}
+main{
+
+    font: 1em sans-serif;
+    display: flex;
+    padding: 2rem;
+    justify-content: center;
+    align-items: center;
+
+}
+
+.s-container {
+    background: white;
+    width: 100%;
+    max-width: 420px;
+    padding: 2.2rem 2rem;
+    border-radius: 24px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
+}
+.s-container h1{
+    color: #394d6e;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 600;
+}
+#register-f{
+    display: flex;
+    flex-direction: column;
+    gap: 1.3rem;
+}
+.form-g{
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+}
+.form-g label{
+    font-weight: 400;
+    color: palevioletred;
+    font-size: 0.95rem;
+}
+.form-g input{
+    padding: 0.8rem 0.8rem;
+    border: 1px solid rgb(80, 13, 143);
+    border-radius: 10px;
+    transition: 0.3s;
+}
+.form-g input:focus {
+    border-color: #ed2233;
+    box-shadow: 0 0 0 3px rgba(185, 25, 38, 0.2);
+    outline: none;
+}
+.h{
+    font-size: 0.8rem;
+    color: #81787e;
+    margin-top: 0.1rem;
+}
+.btn-primary{
+    background: #fcdff9;
+    color:rgb(121, 117, 117);
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 500;
+    padding: 1px;
+    margin-top: 0.6rem;
+}
+.acc{
+    color: #475569;
+    text-align: center;
+
+}
+.acc a{
+    color: #efbfbf;
+    text-decoration:none;
+    font-weight: 400;
+}
+.acc a:hover{
+    text-decoration: underline;
+}
+@media (min-width:480px) {
+    .n1{
+        flex-direction: column;
+        gap: 0.6rem;
+        padding: 1rem; 
+    }
+    
+    
+}
