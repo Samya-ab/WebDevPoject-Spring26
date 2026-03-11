@@ -1,17 +1,17 @@
 :root {
 
-    --color-bg: #f5f5f0;
-    --color-border: #e2e1dc;
-    --color-border-focus: #3d3d3d;
-    --color-surface: #ffffff;
-    --color-surface-2: #f0efea;
+    --color-bg: #f8edf8;
+    --color-border: #d1a3a3;
+    --color-border-focus: #175e9c;
+    --color-surface: #fcdff9;
+    --color-surface-2: #f8edf8;
 
 
-    --avatar-bg: #d5e8c4;
+    --avatar-bg: #db7093;
 
-    --color-text: #1a1a1a;
-    --color-text-muted: #6b6b6b;
-    --color-text-light: #9a9a9a;
+    --color-text: #394d6e;
+    --color-text-muted: #797577;
+    --color-text-light: #b2c5f1;
 
 
     --font-sans: 'Georgia', 'Times New Roman', serif;
@@ -346,6 +346,7 @@ button:active {
     gap: 0;
     border-bottom: 1.5px solid var(--color-border);
     margin-bottom: 16px;
+    padding-bottom: 3px;
 }
 
 .feed-tab {
@@ -353,7 +354,7 @@ button:active {
     font-size: 0.95rem;
     font-weight: 500;
     color: var(--color-text-muted);
-    border-bottom: 3px solid transparent;
+    border-bottom: 2px solid transparent;
     transition: color 200ms ease, border-color 200ms ease;
     cursor: pointer;
 }
@@ -364,7 +365,7 @@ button:active {
 
 .feed-tab.active {
     color: var(--color-text);
-    border-bottom-color: var(--color-text-muted);
+    border-color: var(--color-border-focus);
     font-weight: 600;
 }
 
@@ -400,4 +401,71 @@ button:active {
     width: 28px;
     height: 28px;
     font-size: 0.85rem;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
+-----Media Queries-----
+
+ */
+
+@media (max-width: 1100px) {
+
+    .feed-layout {
+        grid-template-columns: 220px 1fr;
+    }
+
+    .sidebar-right {
+        display:none;
+    }
+}
+
+
+
+@media (max-width: 700px) {
+    .feed-layout {
+        grid-template-columns: 1fr;
+        padding: 12px;
+    }
+
+    .sidebar-left,
+    .sidebar-right {
+        display:none;
+    }
+
+    .app-nav {
+        gap: 12px;
+    }
+
+    .search-box {
+        max-width: 180px;
+    }
+    .logo {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 500px) {
+    .post-textarea {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+    .create-post-box {
+        padding: 12px;
+    }
 }
