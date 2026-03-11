@@ -10,14 +10,14 @@
 
 <body class="app-page">
     <!-- Top navigation -->
-    <header>
+    <header class="app-header">
         <nav class="app-nav">
             <a href="feed.html" class="logo"> Murmur </a>
 
             <!-- Search -->
             <div class="search-box">
-                <input type="search" id="search-input" placeholder="Search users..." autocomplete="off">
-                <ul id="search-results" class="search-results" hidden></ul> >
+                <input type="search" class= "search-input" id="search-input" placeholder="Search users..." autocomplete="off">
+                <ul id="search-results" class="search-results" hidden></ul> 
             </div>
 
             <div class="nav-actions">
@@ -37,7 +37,7 @@
         <!-- Left Sidebar -->
         <aside class="sidebar-left">
             <div class="sidebar-profile-card">
-                <span id="sidebar-avatar " class="avatar avatar-md"></span>
+                <span id="sidebar-avatar" class="avatar avatar-md"></span>
                 <div class="sidebar-user-info">
                     <strong id="sidebar-username"></strong>
                     <span id="sidebar-handle" class="handle"></span>
@@ -61,7 +61,6 @@
             </nav>
 
 
-            </div>
         </aside>
 
 
@@ -77,7 +76,7 @@
                 </div>
 
                 <div class="create-post-actions">
-                    <span id="char-count">280</span>
+                    <span id="char-count" class="char-count">280</span>
                     <button id="submit-post-btn">Post</button>
                 </div>
             </div>
@@ -100,9 +99,21 @@
 
         </section>
 
+
+        <!-- Right sidebar  -->
+        <aside class="sidebar-right">
+            <div class="who-to-follow">
+                <h3 class="sidebar-heading">Who to Follow</h3>
+                <ul id="suggestions-list" class="suggestions-list">
+                    <!-- JS will render suggested users here -->
+                </ul>
+            </div>
+        </aside>
+
     </main>
 
 
+    <script src="script.js"></script>
 </body>
 
 </html>
