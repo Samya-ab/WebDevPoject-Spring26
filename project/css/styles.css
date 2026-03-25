@@ -561,13 +561,18 @@ button:active {
     font-weight: 600;
 }
 
-.s-container button {
+.s-container .btn-primary {
     background: var(--color-surface);
     color: var(--color-text);
     border: none;
     font-size: 1.1rem;
     font-weight: 500;
     padding: 1px;
+}
+
+.s-container .btn-primary:hover {
+    background: var(--color-border-focus);
+    color: #fff;
 }
 
 #register-f {
@@ -609,15 +614,16 @@ button:active {
     margin-top: 0.1rem;
 }
 
-.btn-primary {
-
-    background: var(--color-surface);
-    color: var(--color-text);
-    border: none;
-    font-size: 1.1rem;
-    font-weight: 500;
-    padding: 1px;
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 9px 18px;
+  border-radius: 99px;
+  font-family: var(--font-ui); font-size: 0.9rem; font-weight: 500;
+  cursor: pointer; border: none;
+  transition: background 200ms ease, color 200ms ease,
+    border-color 200ms ease, transform 200ms ease;
 }
+
 
 .acc {
     color: var(--color-text-muted);
