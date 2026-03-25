@@ -138,8 +138,20 @@ function createPostElement(post) {
     header.className = 'post-header';
 
     const avatar = document.createElement('div');
-    avatar.className = 'avatar avatar-md';
+avatar.className = 'avatar avatar-md';
+
+if (author.avatarUrl) {
+    const img = document.createElement('img');
+    img.src = author.avatarUrl;
+    img.alt = author.username;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+
+    avatar.appendChild(img);
+} else {
     avatar.textContent = author.username.charAt(0).toUpperCase();
+}
 
     const authorInfo = document.createElement('div');
     authorInfo.innerHTML = `
