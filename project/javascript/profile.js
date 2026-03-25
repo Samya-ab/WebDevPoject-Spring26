@@ -105,20 +105,6 @@ function init() {
     window.location.href = 'login.html';
   });
 
-
-  // login
-
-  function loginUser(email, password) {
-  let users = ls.get("users") || [];
-  const user = users.find(u => u.email === email && u.password === password);
-  if (!user) {
-    alert("Invalid credentials");
-    return;
-  }
-  ls.set("session", { userId: user.id });
-  window.location.href = "feed.html";
-}
-
   /* Nav search — Enter navigates to feed */
   document.getElementById('search-input').addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.target.value.trim())
