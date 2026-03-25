@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+
+    <link rel="stylesheet" href="/project/css/styles.css">
+</head>
+
+<body>
+
+<header class="app-header">
+    <nav class="app-nav">
+        <a href="#" class="logo">Murmur</a>
+    </nav>
+</header>
+
+<main style="display:flex; justify-content:center; align-items:center; min-height:calc(100vh - 60px);">
+
+    <section class="s-container">
+        <h1>Login</h1>
+
+        <form id="login-f">
+
+            <!-- Email -->
+            <div class="form-g">
+                <label>Email</label>
+                <input type="email" placeholder="Enter your email" required>
+            </div>
+
+            <!-- Password -->
+            <div class="form-g">
+                <label>Password</label>
+                <input type="password" placeholder="Enter your password" required>
+            </div>
+
+            <!-- Error message -->
+            <p id="error-msg" class="h" style="color: var(--danger); display:none;">
+                Invalid email or password
+            </p>
+
+            <!-- Button -->
+            <button type="submit" class="btn btn-primary">
+                Login
+            </button>
+
+        </form>
+
+        <!-- Link -->
+        <p class="acc">
+            Don’t have an account?
+            <a href="register.html">Register</a>
+        </p>
+
+    </section>
+
+</main>
+
+</body>
+</html>
