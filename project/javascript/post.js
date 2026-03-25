@@ -25,8 +25,9 @@ if (!post) {
 }
 
 // Find the author
-const author = users.find(u => u.id === post.authorId);
-
+const author = users.find(u => u.id === post.authorId) || {
+    username: 'unknown'
+};
 // Helper: time ago function (same as profile.js)
 function timeAgo(timestamp) {
     const s = Math.floor((Date.now() - timestamp) / 1000);
@@ -107,20 +108,27 @@ function renderPost() {
 function renderComments() {
     const commentsList = document.querySelector('.comments');
     const comments = post.comments || [];
+
+ 
     
     // Remove existing comments except the form
-    const existingComments = commentsList.querySelectorAll('.comment-item:not(.comment-form-parent)');
+    const existingComments = commentsList.querySelectorAll('.comment-item');
     existingComments.forEach(c => c.remove());
-    
+
+    // Remove old "no comments" message if exists
+    const oldMsg = commentsList.querySelector('.no-comments');
+    if (oldMsg) oldMsg.remove();
+
     if (comments.length === 0) {
-        const noComments = document.createElement('p');
-        noComments.textContent = 'No comments yet. Be the first to comment!';
-        noComments.style.color = 'var(--color-text-muted)';
-        noComments.style.padding = '20px';
-        noComments.style.textAlign = 'center';
-        commentsList.insertBefore(noComments, commentsList.querySelector('.comment-form'));
-        return;
-    }
+    const noComments = document.createElement('p');
+    noComments.className = 'no-comments';
+    noComments.textContent = 'No comments yet. Be the first to comment!';
+    noComments.style.color = 'var(--color-text-muted)';
+    noComments.style.padding = '20px';
+    noComments.style.textAlign = 'center';
+    commentsList.insertBefore(noComments, commentsList.querySelector('.comment-form'));
+    return;
+}
     
     comments.forEach(comment => {
         const commentUser = users.find(u => u.id === comment.authorId);
@@ -133,8 +141,12 @@ function renderComments() {
                 <p>${esc(comment.text)}</p>
             </div>
         `;
-        commentsList.insertBefore(commentDiv, commentsList.querySelector('.comment-form'));
-    });
+        const form = commentsList.querySelector('.comment-form');
+        if (form) {
+            commentsList.insertBefore(commentDiv, form);
+        } else {
+            commentsList.appendChild(commentDiv);
+        }    });
 }
 
 /* ============================================================
@@ -161,6 +173,8 @@ function toggleLike() {
     
     localStorage.setItem('posts', JSON.stringify(posts));
     if (likeStat) likeStat.textContent = `❤️ ${posts[postIndex].likes.length} likes`;
+    //Post is updated after a like
+    post.likes = posts[postIndex].likes;
 }
 
 /* ============================================================
@@ -197,6 +211,8 @@ function addComment() {
     const commentsTitle = document.querySelector('.comments h3');
     if (commentsTitle) commentsTitle.textContent = `Comments (${posts[postIndex].comments.length})`;
     
+    //Post is updated after a comment
+    post.comments = posts[postIndex].comments;
     // Reload comments UI
     renderComments();
 }
