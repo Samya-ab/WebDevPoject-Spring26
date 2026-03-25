@@ -1399,7 +1399,7 @@ button:active {
     }
 }
 
-@media (max-width: 640) {
+@media (max-width: 640px) {
     .post-textarea {
         font-size: 0.9rem;
         padding: 8px;
