@@ -20,9 +20,9 @@
             <div class="nav-actions">
                 <a href="profile.html" id="nav-profile-link">
                     Profile
-                    <span class="avatar avatar-sm">KH</span>
+                    <span id="nav-avatar" class="avatar avatar-sm"></span>
                 </a>
-                <button>Log out</button>
+                <button id="logout-btn">Log out</button>
             </div>
         </nav>
     </header>
@@ -31,14 +31,14 @@
         <!-- Left Sidebar -->
         <aside class="sidebar-left">
             <div class="sidebar-profile-card">
-                <span class="avatar avatar-md">KH</span>
+                <span id="sidebar-avatar" class="avatar avatar-md"></span>
                 <div class="sidebar-user-info">
-                    <strong>Khaled Hamad</strong>
-                    <span class="handle">@khaled0326</span>
+                    <strong id="sidebar-username"></strong>
+                    <span id="sidebar-handle" class="handle"></span>
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <a href="feed.html" class="sidebar-link active">🏠 Home</a>
+                <a href="feed.html" class="sidebar-link">🏠 Home</a>
                 <a href="profile.html" class="sidebar-link">👤 Profile</a>
             </nav>
         </aside>
@@ -51,56 +51,40 @@
 
             <article class="post-card">
                 <header class="post-header">
-                    <div class="avatar avatar-md">SS</div>
+                    <div id="post-author-avatar" class="avatar avatar-md"></div>
                     <div>
-                        <h2>Sara Smith</h2>
+                        <h2 id="post-author-name"></h2>
                         <div class="post-meta">
-                            <span>@sara_ll</span> · <span>2 hours ago</span>
+                            <span id="post-author-username"></span> · <span id="post-timestamp"></span>
                         </div>
                     </div>
                 </header>
 
-                <p class="post-content">Working on the social media project! Using HTML and CSS Grid/Flexbox. #webdev
-                </p>
+                <p id="post-content" class="post-content"></p>
 
                 <div class="post-stats">
-                    <span>❤️ 5 likes</span>
-                    <span>💬 3 comments</span>
+                    <span id="likes-count">❤️ 0 likes</span>
+                    <span id="comments-count">💬 0 comments</span>
                 </div>
 
-                <button class="like-btn">❤️ Like</button>
+                <button id="like-btn" class="like-btn">❤️ Like</button>
 
                 <section class="comments">
-                    <h3>Comments (3)</h3>
+                    <h3>Comments <span id="comment-count">(0)</span></h3>
 
                     <div class="comment-form">
-                        <div class="avatar avatar-sm">JD</div>
-                        <input type="text" placeholder="Add a comment...">
-                        <button>Post</button>
+                        <div id="comment-avatar" class="avatar avatar-sm"></div>
+                        <input type="text" id="comment-input" placeholder="Add a comment...">
+                        <button id="submit-comment">Post</button>
                     </div>
 
-                    <div class="comment-item">
-                        <div class="avatar avatar-sm">LA</div>
-                        <div>
-                            <strong>Leen Ahmed</strong> <small>1h ago</small>
-                            <p>Great work!</p>
-                        </div>
-                    </div>
-
-                    <div class="comment-item">
-                        <div class="avatar avatar-sm">F</div>
-                        <div>
-                            <strong>Farah</strong> <small>30m ago</small>
-                            <p>Looks good!</p>
-                        </div>
-                    </div>
+                    <div id="comments-list"></div>
                 </section>
             </article>
         </main>
     </div>
 
     <script src="javascript/post.js"></script>
-
 </body>
 
 </html>
