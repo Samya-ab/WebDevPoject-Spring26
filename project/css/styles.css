@@ -67,12 +67,12 @@ ul {
     list-style: none;
 }
 
-/* button {
+button {
     cursor: pointer;
     border: none;
     background: none;
     font-family: var(--font-ui);
-} */
+}
 
 input,
 textarea {
@@ -409,17 +409,6 @@ button:active {
     font-size: 0.85rem;
 }
 
-.post-image {
-    width: 100%;
-    border-radius: 12px;
-    margin-top: 10px;
-    object-fit: cover;
-    max-height: 400px;
-}
-
-
-
-
 
 
 
@@ -626,22 +615,13 @@ button:active {
 }
 
 .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-
-    padding: 10px 18px;
-    border-radius: 999px;
-
-    font-family: var(--font-ui);
-    font-size: 0.9rem;
-    font-weight: 500;
-
-    cursor: pointer;
-    border: 1.5px solid transparent;
-
-    transition: all 200ms ease;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 9px 18px;
+  border-radius: 99px;
+  font-family: var(--font-ui); font-size: 0.9rem; font-weight: 500;
+  cursor: pointer; border: none;
+  transition: background 200ms ease, color 200ms ease,
+    border-color 200ms ease, transform 200ms ease;
 }
 
 
