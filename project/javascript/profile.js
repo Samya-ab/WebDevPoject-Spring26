@@ -309,10 +309,12 @@ function makeThumb(post) {
         '<span class="thumb-stat">&#x1F4AC; ' + (post.comments||[]).length + '</span>' +
       '</div>';
   }
-  div.onclick = () => openModal(post.id);
+  // CHANGE: go to post.html instead of opening modal
+  div.onclick = () => {
+    window.location.href = 'post.html?id=' + post.id;
+  };
   return div;
 }
-
 
 /* ============================================================
    ADD POST MODAL
