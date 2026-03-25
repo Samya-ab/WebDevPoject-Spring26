@@ -201,6 +201,15 @@ function createPostElement(post) {
 
     div.appendChild(header);
     div.appendChild(content);
+    if (post.imageUrl) {
+    const img = document.createElement('img');
+    img.src = post.imageUrl;
+    img.alt = 'post image';
+    img.className = 'post-image';
+
+    div.appendChild(img);
+}
+
     div.appendChild(stats);
     div.appendChild(actions);
 
@@ -254,6 +263,7 @@ function deletePost(postId) {
 function setupCreatePost() {
     const textarea = document.getElementById('post-content');
     const submitBtn = document.getElementById('submit-post-btn');
+    const imageUrlInput = document.getElementById('post-image-url');
     const charCountSpan = document.getElementById('char-count');
     if (!textarea || !submitBtn) return;
 
@@ -277,7 +287,7 @@ function setupCreatePost() {
             timestamp: Date.now(),
             likes: [],
             comments: [],
-            imageUrl: '', // text-only per spec
+            imageUrl: imageUrlInput.value.trim(), 
         };
 
         const posts = ls.get('posts') || [];
@@ -285,6 +295,7 @@ function setupCreatePost() {
         ls.set('posts', posts);
 
         textarea.value = '';
+        imageUrlInput.value = '';
         updateCharCount();
 
         // If current tab is 'following' and the post is by the user,
