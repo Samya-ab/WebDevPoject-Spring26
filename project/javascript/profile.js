@@ -56,7 +56,13 @@ function seedDemoData() {
     { id: uid(), authorId: me, imageUrl: 'https://picsum.photos/seed/lab/600/600',         caption: 'Running SEED Labs at 2am is a vibe. Why does everything click at midnight',                                      timestamp: Date.now()-3600000,   likes:[],                comments:[] },
     { id: uid(), authorId: me, imageUrl: 'https://picsum.photos/seed/quantum/600/600',     caption: 'Built a quantum randomizer class in Qiskit today for the UREP research. Dr. Noora is going to love this.',       timestamp: Date.now()-1800000,   likes:['u2'],            comments:[] },
   ]);
-  ls.set('session', { userId: me });
+  // ls.set('session', { userId: me }); 
+  /* YARA:commented this until I check validation, no auto login */
+
+  if (!ls.get('session')) {
+        return;
+}
+
 }
 
 
@@ -467,3 +473,6 @@ function submitComment() {
 
 
 document.addEventListener('DOMContentLoaded', init);
+
+
+
