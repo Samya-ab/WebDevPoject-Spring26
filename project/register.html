@@ -1,21 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registeration · Murmur</title>
-    <link rel="stylesheet" href="/project/css/styles.css">
+    <title>Registration · Murmur</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
+
 <body>
     <header class="app-header">
-    <nav class="app-nav">
-        <a href="feed.html" class="logo">Murmur</a>
-        <div class="nav-actions">
-            <a href="login.html">Log in</a>
-            <a href="register.html" class="active-nav">Register</a>
-        </div>
-    </nav>
-</header>
+        <nav class="app-nav">
+            <a href="feed.html" class="logo">Murmur</a>
+            <div class="nav-actions">
+                <a href="login.html">Log in</a>
+                <a href="register.html" class="active-nav">Register</a>
+            </div>
+        </nav>
+    </header>
 
     <main>
         <section class="s-container">
@@ -23,31 +25,36 @@
             <form id="register-f">
                 <div class="form-g">
                     <label for="username">UserName</label>
-                    <input type="text" id="username" name="username" placeholder="enter your user name" required>
-
+                    <input type="text" id="username" name="username" placeholder="Enter your username" required
+                        minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+"
+                        title="Username must be 3–20 characters and contain only letters, numbers, or underscores">
                 </div>
                 <div class="form-g">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="email"  placeholder="enter your email" required>
+                    <input type="email" id="email" name="email" placeholder="Enter your email" required>
                 </div>
                 <div class="form-g">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password"  placeholder="enter your password" required>
-                    <small class="h">It should Include numbers and letters</small>
+                    <input type="password" id="password" name="password" placeholder="Enter your password" required
+                        minlength="6" pattern="(?=.*[A-Za-z])(?=.*\d).{6,}"
+                        title="Password must be at least 6 characters and include both letters and numbers"> 
                 </div>
                 <div class="form-g">
                     <label for="profile">Profile Picture(optional)</label>
                     <input type="file" id="profile" name="profile" accept="image/*">
-                    
+
                 </div>
                 <button type="submit" class="btn-primary">Register</button>
-                
+
             </form>
 
-                <p class="acc">Already have an acoount?<a href="login.html">Log in</a></p>
+            <p class="acc">Already have an account?<a href="login.html">Log in</a></p>
 
         </section>
     </main>
-    
+
+    <script src="javascript/register.js"></script>
+
 </body>
+
 </html>
