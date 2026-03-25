@@ -3,9 +3,9 @@ const form = document.getElementById("register-f");
 form.addEventListener("submit", function(e) {
     e.preventDefault();
 
-    const username = document.getElementById("reg-username").value.trim();
-    const email = document.getElementById("reg-email").value.trim();
-    const password = document.getElementById("reg-password").value.trim();
+    const username = document.getElementById("username").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
 
     let users = JSON.parse(localStorage.getItem("users")) || [];
 
