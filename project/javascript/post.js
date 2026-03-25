@@ -61,6 +61,14 @@ function renderPost() {
     // Set post content
     const postContent = document.querySelector('.post-content');
     if (postContent) postContent.textContent = post.caption || '';
+
+    const postImage = document.getElementById('post-image');
+    if (post.imageUrl) {
+        postImage.src = post.imageUrl;
+        postImage.style.display = 'block';
+    } else {
+        postImage.style.display = 'none';
+    }
     
     // Set stats
     const likeStat = document.querySelector('.post-stats span:first-child');
