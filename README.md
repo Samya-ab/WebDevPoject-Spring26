@@ -2,7 +2,16 @@
 
 Web development project for CMPS350-L52 Spring 2026
 
+    (Murmur Wepsite)
 
-Students Name:
+    Group 1
 
-Aldana Al-mansouri 202103034
+    Students Name:
+
+Aldana Al-mansouri 	202103034
+
+Samya Abadir		 202306611
+
+Amal Nasser 		202103034
+
+Nusaibah Zaffer 	202313427
