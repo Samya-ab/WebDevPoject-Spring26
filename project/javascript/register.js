@@ -6,7 +6,7 @@ form.addEventListener("submit", function(e) {
     const username = document.getElementById("username").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
-    const fileInput=document.getElementById('Profile-picture');
+    const fileInput=document.getElementById('profile');
     const file=fileInput.files[0];
     let users = JSON.parse(localStorage.getItem("users")) || [];
 
