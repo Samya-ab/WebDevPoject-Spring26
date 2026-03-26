@@ -112,9 +112,53 @@ function init() {
   });
 
   /* Nav search — Enter navigates to feed */
-  document.getElementById('search-input').addEventListener('keydown', e => {
+  const searchInput = document.getElementById('search-input');
+  const searchResults = document.getElementById('search-results');
+
+  let debounceTimeout;
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(debounceTimeout);
+    const query = e.target.value.trim().toLowerCase();
+    if (!query) {
+      searchResults.hidden = true;
+      searchResults.innerHTML = '';
+      return;
+    }
+    debounceTimeout = setTimeout(() => {
+      const users = ls.get('users') || [];
+      const matches = users.filter(
+        u => u.username.toLowerCase().includes(query) && u.id !== currentUser.id
+      );
+      if (matches.length === 0) {
+        searchResults.innerHTML = '<li style="padding: 8px;">No users found</li>';
+        searchResults.hidden = false;
+        return;
+      }
+      searchResults.innerHTML = '';
+      matches.forEach(user => {
+        const li = document.createElement('li');
+        li.style.padding = '8px';
+        li.style.cursor = 'pointer';
+        li.style.borderBottom = '1px solid var(--color-border)';
+        li.textContent = `@${user.username}`;
+        li.addEventListener('click', () => {
+          window.location.href = `profile.html?uid=${user.id}`;
+        });
+        searchResults.appendChild(li);
+      });
+      searchResults.hidden = false;
+    }, 300);
+  });
+
+  searchInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && e.target.value.trim())
       window.location.href = 'feed.html?q=' + encodeURIComponent(e.target.value.trim());
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!searchResults.contains(e.target) && e.target !== searchInput) {
+      searchResults.hidden = true;
+    }
   });
 
   /* Close modals on overlay click */

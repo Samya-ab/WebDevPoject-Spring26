@@ -47,20 +47,19 @@ function esc(s) {
    RENDER POST
 ============================================================ */
 function renderPost() {
-    // Set author info
-    const authorName = document.querySelector('.post-header h2');
-    const authorUsername = document.querySelector('.post-header .post-meta span:first-child');
-    const authorAvatar = document.querySelector('.post-header .avatar');
-    const postTime = document.querySelector('.post-header .post-meta span:last-child');
-    
-    if (authorName) authorName.textContent = author.username;
-    if (authorUsername) authorUsername.textContent = '@' + author.username;
-    if (authorAvatar) authorAvatar.textContent = author.username.charAt(0).toUpperCase();
-    if (postTime) postTime.textContent = ' ' + timeAgo(post.timestamp);
-    
-    // Set post content
-    const postContent = document.querySelector('.post-content');
-    if (postContent) postContent.textContent = post.caption || '';
+    document.getElementById('post-author-name').textContent = author.username;
+    document.getElementById('post-author-username').textContent = '@' + author.username;
+    document.getElementById('post-timestamp').textContent = timeAgo(post.timestamp);
+
+    // Author avatar — image or initials
+    const authorAvatar = document.getElementById('post-author-avatar');
+    if (author.avatarUrl) {
+        authorAvatar.innerHTML = `<img src="${author.avatarUrl}" alt="avatar">`;
+    } else {
+        authorAvatar.textContent = author.username.charAt(0).toUpperCase();
+    }
+
+    document.getElementById('post-content').textContent = post.caption || '';
 
     const postImage = document.getElementById('post-image');
     if (post.imageUrl) {
@@ -69,22 +68,27 @@ function renderPost() {
     } else {
         postImage.style.display = 'none';
     }
-    
-    // Set stats
-    const likeStat = document.querySelector('.post-stats span:first-child');
-    const commentStat = document.querySelector('.post-stats span:last-child');
-    
-    if (likeStat) likeStat.textContent = `❤️ ${(post.likes || []).length} likes`;
-    if (commentStat) commentStat.textContent = `💬 ${(post.comments || []).length} comments`;
-    
-    // Set like button state
-    const likeBtn = document.querySelector('.like-btn');
+
+    document.getElementById('likes-count').textContent = `❤️ ${(post.likes || []).length} likes`;
+    document.getElementById('comments-count').textContent = `💬 ${(post.comments || []).length} comments`;
+    document.getElementById('comment-count').textContent = `(${(post.comments || []).length})`;
+
+    // Like button state
+    const likeBtn = document.getElementById('like-btn');
     if ((post.likes || []).includes(currentUser.id)) {
         likeBtn.classList.add('liked');
         likeBtn.innerHTML = '❤️ Liked';
     }
-    
-    // Show delete button if owner
+
+    // Comment compose avatar — image or initials
+    const commentAvatar = document.getElementById('comment-avatar');
+    if (currentUser.avatarUrl) {
+        commentAvatar.innerHTML = `<img src="${currentUser.avatarUrl}" alt="avatar">`;
+    } else {
+        commentAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+    }
+
+    // Delete button if owner
     if (post.authorId === currentUser.id) {
         const deleteBtn = document.createElement('button');
         deleteBtn.textContent = 'Delete Post';
@@ -101,12 +105,7 @@ function renderPost() {
         };
         document.querySelector('.post-card').appendChild(deleteBtn);
     }
-    
-    // Update comment count in comments section
-    const commentsTitle = document.querySelector('.comments h3');
-    if (commentsTitle) commentsTitle.textContent = `Comments (${(post.comments || []).length})`;
-    
-    // Render comments
+
     renderComments();
 }
 
@@ -142,8 +141,12 @@ function renderComments() {
         const commentUser = users.find(u => u.id === comment.authorId);
         const commentDiv = document.createElement('div');
         commentDiv.className = 'comment-item';
+        const avatarContent = commentUser?.avatarUrl
+            ? `<img src="${commentUser.avatarUrl}" alt="avatar">`
+            : (commentUser?.username || '?').charAt(0).toUpperCase();
+
         commentDiv.innerHTML = `
-            <div class="avatar avatar-sm">${(commentUser?.username || '?').charAt(0).toUpperCase()}</div>
+            <div class="avatar avatar-sm">${avatarContent}</div>
             <div>
                 <strong>${esc(commentUser?.username || 'unknown')}</strong> <small>${timeAgo(comment.timestamp)}</small>
                 <p>${esc(comment.text)}</p>
@@ -229,15 +232,30 @@ function addComment() {
    UPDATE SIDEBAR WITH CURRENT USER
 ============================================================ */
 function updateSidebar() {
-    const sidebarAvatar = document.querySelector('.sidebar-profile-card .avatar');
-    const sidebarName = document.querySelector('.sidebar-user-info strong');
-    const sidebarHandle = document.querySelector('.sidebar-user-info .handle');
-    const navAvatar = document.querySelector('.nav-actions .avatar');
-    
-    if (sidebarAvatar) sidebarAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
-    if (sidebarName) sidebarName.textContent = currentUser.username;
-    if (sidebarHandle) sidebarHandle.textContent = '@' + currentUser.username;
-    if (navAvatar) navAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
+    const sidebarUsername = document.getElementById('sidebar-username');
+    const sidebarHandle = document.getElementById('sidebar-handle');
+    const sidebarAvatar = document.getElementById('sidebar-avatar');
+    const navAvatar = document.getElementById('nav-avatar');
+    const createPostAvatar = document.getElementById('create-post-avatar');
+    const navProfileLink = document.getElementById('nav-profile-link');
+
+    if (sidebarUsername) sidebarUsername.textContent = currentUser.username;
+    if (sidebarHandle) sidebarHandle.textContent = `@${currentUser.username}`;
+    if (navProfileLink) navProfileLink.href = `profile.html?uid=${currentUser.id}`;
+
+    // Helper: fill an avatar element with either an img or initials
+    function fillAvatar(el) {
+        if (!el) return;
+        if (currentUser.avatarUrl) {
+            el.innerHTML = `<img src="${currentUser.avatarUrl}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:99px;">`;
+        } else {
+            el.textContent = currentUser.username.charAt(0).toUpperCase();
+        }
+    }
+
+    fillAvatar(sidebarAvatar);
+    fillAvatar(navAvatar);
+    fillAvatar(createPostAvatar);
 }
 
 /* ============================================================
@@ -260,21 +278,13 @@ document.addEventListener('DOMContentLoaded', () => {
     renderPost();
     updateSidebar();
     setupLogout();
-    
-    // Setup event listeners
-    const likeBtn = document.querySelector('.like-btn');
-    if (likeBtn) likeBtn.addEventListener('click', toggleLike);
-    
-    const submitBtn = document.querySelector('.comment-form button');
-    if (submitBtn) submitBtn.addEventListener('click', addComment);
-    
-    const commentInput = document.querySelector('.comment-form input');
-    if (commentInput) {
-        commentInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addComment();
-            }
-        });
-    }
+
+    document.getElementById('like-btn').addEventListener('click', toggleLike);
+    document.getElementById('submit-comment').addEventListener('click', addComment);
+    document.getElementById('comment-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addComment();
+        }
+    });
 });

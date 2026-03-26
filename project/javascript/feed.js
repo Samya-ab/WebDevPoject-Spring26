@@ -373,7 +373,11 @@ function renderSuggestions() {
 
         const avatar = document.createElement('div');
         avatar.className = 'avatar avatar-sm';
-        avatar.textContent = user.username.charAt(0).toUpperCase();
+        if (user.avatarUrl) {
+            avatar.innerHTML = `<img src="${user.avatarUrl}" alt="avatar">`;
+        } else {
+            avatar.textContent = user.username.charAt(0).toUpperCase();
+        }
 
         const info = document.createElement('div');
         info.style.flex = '1';
