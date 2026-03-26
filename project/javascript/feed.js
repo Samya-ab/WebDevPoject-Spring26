@@ -1,14 +1,3 @@
-// const session = JSON.parse(localStorage.getItem("session"));
-// const users = JSON.parse(localStorage.getItem("users")) || [];
-// const posts = JSON.parse(localStorage.getItem("posts")) || [];
-
-// const currentUser = users.find(u => u.id === session.userId);
-
-// // show posts from followed users
-// const feedPosts = posts.filter(p =>
-//     currentUser.following.includes(p.authorId)
-// );
-
 
 
 // ============================================================
@@ -473,13 +462,26 @@ function updateSidebar() {
     const sidebarHandle = document.getElementById('sidebar-handle');
     const sidebarAvatar = document.getElementById('sidebar-avatar');
     const navAvatar = document.getElementById('nav-avatar');
+    const createPostAvatar = document.getElementById('create-post-avatar');
     const navProfileLink = document.getElementById('nav-profile-link');
 
     if (sidebarUsername) sidebarUsername.textContent = currentUser.username;
     if (sidebarHandle) sidebarHandle.textContent = `@${currentUser.username}`;
-    if (sidebarAvatar) sidebarAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
-    if (navAvatar) navAvatar.textContent = currentUser.username.charAt(0).toUpperCase();
     if (navProfileLink) navProfileLink.href = `profile.html?uid=${currentUser.id}`;
+
+    // Helper: fill an avatar element with either an img or initials
+    function fillAvatar(el) {
+        if (!el) return;
+        if (currentUser.avatarUrl) {
+            el.innerHTML = `<img src="${currentUser.avatarUrl}" alt="avatar" style="width:100%;height:100%;object-fit:cover;border-radius:99px;">`;
+        } else {
+            el.textContent = currentUser.username.charAt(0).toUpperCase();
+        }
+    }
+
+    fillAvatar(sidebarAvatar);
+    fillAvatar(navAvatar);
+    fillAvatar(createPostAvatar);
 }
 
 function setupLogout() {
