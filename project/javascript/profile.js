@@ -314,7 +314,6 @@ function renderPosts() {
       '<div class="empty-state">' +
         '<div class="ei">&#x1F4F7;</div>' +
         '<p>' + (isOwnProfile ? 'No posts yet.' : '@' + esc(profileUser.username) + ' hasn\'t posted yet.') + '</p>' +
-        (isOwnProfile ? '<button class="btn btn-primary" onclick="openAddModal()" style="margin:0 auto">+ New Post</button>' : '') +
       '</div>';
     return;
   }
