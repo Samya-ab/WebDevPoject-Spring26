@@ -22,6 +22,38 @@ function toast(msg) {
     setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+function showConfirm(message, onConfirm, title = 'Confirm action') {
+    const modal = document.getElementById('confirm-modal');
+    const titleEl = document.getElementById('confirm-title');
+    const messageEl = document.getElementById('confirm-message');
+    const okBtn = document.getElementById('confirm-ok');
+    const cancelBtn = document.getElementById('confirm-cancel');
+
+    if (!modal || !titleEl || !messageEl || !okBtn || !cancelBtn) return;
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    modal.classList.add('open');
+
+    const closeModal = () => {
+        modal.classList.remove('open');
+        okBtn.onclick = null;
+        cancelBtn.onclick = null;
+        modal.onclick = null;
+    };
+
+    okBtn.onclick = () => {
+        closeModal();
+        onConfirm();
+    };
+
+    cancelBtn.onclick = closeModal;
+
+    modal.onclick = (e) => {
+        if (e.target === modal) closeModal();
+    };
+}
+
 function timeAgo(ts) {
     const s = Math.floor((Date.now() - ts) / 1000);
     if (s < 60) return s + 's ago';
@@ -40,6 +72,20 @@ function esc(s) {
 
 function uid() {
     return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+}
+
+function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        if (!file) {
+            resolve('');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error('Failed to read file'));
+        reader.readAsDataURL(file);
+    });
 }
 
 // ============================================================
@@ -127,13 +173,13 @@ function createPostElement(post) {
     header.className = 'post-header';
 
     const avatar = document.createElement('div');
-avatar.className = 'avatar avatar-md';
+    avatar.className = 'avatar avatar-md';
 
-if (author.avatarUrl) {
-    avatar.innerHTML = `<img src="${author.avatarUrl}" alt="avatar">`;
-} else {
-    avatar.textContent = author.username.charAt(0).toUpperCase();
-}
+    if (author.avatarUrl) {
+        avatar.innerHTML = `<img src="${author.avatarUrl}" alt="avatar">`;
+    } else {
+        avatar.textContent = author.username.charAt(0).toUpperCase();
+    }
 
     const authorInfo = document.createElement('div');
     authorInfo.innerHTML = `
@@ -186,9 +232,9 @@ if (author.avatarUrl) {
         deleteBtn.style.cursor = 'pointer';
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            if (confirm('Delete this post?')) {
+            showConfirm('Delete this post?', () => {
                 deletePost(post.id);
-            }
+            }, 'Delete post');
         });
         actions.appendChild(deleteBtn);
     }
@@ -196,13 +242,13 @@ if (author.avatarUrl) {
     div.appendChild(header);
     div.appendChild(content);
     if (post.imageUrl) {
-    const img = document.createElement('img');
-    img.src = post.imageUrl;
-    img.alt = 'post image';
-    img.className = 'post-image';
+        const img = document.createElement('img');
+        img.src = post.imageUrl;
+        img.alt = 'post image';
+        img.className = 'post-image';
 
-    div.appendChild(img);
-}
+        div.appendChild(img);
+    }
 
     div.appendChild(stats);
     div.appendChild(actions);
@@ -257,7 +303,7 @@ function deletePost(postId) {
 function setupCreatePost() {
     const textarea = document.getElementById('post-content');
     const submitBtn = document.getElementById('submit-post-btn');
-    const imageUrlInput = document.getElementById('post-image-url');
+    const imageFileInput = document.getElementById('post-image-file');
     const charCountSpan = document.getElementById('char-count');
     if (!textarea || !submitBtn) return;
 
@@ -270,9 +316,16 @@ function setupCreatePost() {
     textarea.addEventListener('input', updateCharCount);
     updateCharCount();
 
-    submitBtn.addEventListener('click', () => {
+    submitBtn.addEventListener('click', async () => {
         const content = textarea.value.trim();
-        if (!content) return;
+        const file = imageFileInput ? imageFileInput.files[0] : null;
+
+        if (!content && !file) return;
+
+        let imageUrl = '';
+        if (file) {
+            imageUrl = await fileToDataUrl(file);
+        }
 
         const newPost = {
             id: uid(),
@@ -281,7 +334,7 @@ function setupCreatePost() {
             timestamp: Date.now(),
             likes: [],
             comments: [],
-            imageUrl: imageUrlInput.value.trim(), 
+            imageUrl: imageUrl,
         };
 
         const posts = ls.get('posts') || [];
@@ -289,12 +342,9 @@ function setupCreatePost() {
         ls.set('posts', posts);
 
         textarea.value = '';
-        imageUrlInput.value = '';
+        if (imageFileInput) imageFileInput.value = '';
         updateCharCount();
 
-        // If current tab is 'following' and the post is by the user,
-        // it will appear only if the user follows themselves? Usually not.
-        // But we still refresh feed.
         renderPosts();
         toast('Post published!');
     });

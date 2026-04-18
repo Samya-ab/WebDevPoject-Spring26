@@ -32,15 +32,47 @@ const author = users.find(u => u.id === post.authorId) || {
 function timeAgo(timestamp) {
     const s = Math.floor((Date.now() - timestamp) / 1000);
     if (s < 60) return s + 's ago';
-    if (s < 3600) return Math.floor(s/60) + 'm ago';
-    if (s < 86400) return Math.floor(s/3600) + 'h ago';
-    return Math.floor(s/86400) + 'd ago';
+    if (s < 3600) return Math.floor(s / 60) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    return Math.floor(s / 86400) + 'd ago';
 }
 
 // Helper: escape HTML
 function esc(s) {
     if (!s) return '';
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function showConfirm(message, onConfirm, title = 'Confirm action') {
+    const modal = document.getElementById('confirm-modal');
+    const titleEl = document.getElementById('confirm-title');
+    const messageEl = document.getElementById('confirm-message');
+    const okBtn = document.getElementById('confirm-ok');
+    const cancelBtn = document.getElementById('confirm-cancel');
+
+    if (!modal || !titleEl || !messageEl || !okBtn || !cancelBtn) return;
+
+    titleEl.textContent = title;
+    messageEl.textContent = message;
+    modal.classList.add('open');
+
+    const closeModal = () => {
+        modal.classList.remove('open');
+        okBtn.onclick = null;
+        cancelBtn.onclick = null;
+        modal.onclick = null;
+    };
+
+    okBtn.onclick = () => {
+        closeModal();
+        onConfirm();
+    };
+
+    cancelBtn.onclick = closeModal;
+
+    modal.onclick = (e) => {
+        if (e.target === modal) closeModal();
+    };
 }
 
 /* ============================================================
@@ -97,11 +129,11 @@ function renderPost() {
         deleteBtn.style.borderColor = '#ed4956';
         deleteBtn.style.color = '#ed4956';
         deleteBtn.onclick = () => {
-            if (confirm('Delete this post?')) {
+            showConfirm('Delete this post?', () => {
                 const updatedPosts = posts.filter(p => p.id !== post.id);
                 localStorage.setItem('posts', JSON.stringify(updatedPosts));
                 window.location.href = 'feed.html';
-            }
+            }, 'Delete post');
         };
         document.querySelector('.post-card').appendChild(deleteBtn);
     }
@@ -116,8 +148,8 @@ function renderComments() {
     const commentsList = document.querySelector('.comments');
     const comments = post.comments || [];
 
- 
-    
+
+
     // Remove existing comments except the form
     const existingComments = commentsList.querySelectorAll('.comment-item');
     existingComments.forEach(c => c.remove());
@@ -127,37 +159,54 @@ function renderComments() {
     if (oldMsg) oldMsg.remove();
 
     if (comments.length === 0) {
-    const noComments = document.createElement('p');
-    noComments.className = 'no-comments';
-    noComments.textContent = 'No comments yet. Be the first to comment!';
-    noComments.style.color = 'var(--color-text-muted)';
-    noComments.style.padding = '20px';
-    noComments.style.textAlign = 'center';
-    commentsList.insertBefore(noComments, commentsList.querySelector('.comment-form'));
-    return;
-}
-    
+        const noComments = document.createElement('p');
+        noComments.className = 'no-comments';
+        noComments.textContent = 'No comments yet. Be the first to comment!';
+        noComments.style.color = 'var(--color-text-muted)';
+        noComments.style.padding = '20px';
+        noComments.style.textAlign = 'center';
+        commentsList.insertBefore(noComments, commentsList.querySelector('.comment-form'));
+        return;
+    }
+
     comments.forEach(comment => {
         const commentUser = users.find(u => u.id === comment.authorId);
         const commentDiv = document.createElement('div');
         commentDiv.className = 'comment-item';
+
         const avatarContent = commentUser?.avatarUrl
             ? `<img src="${commentUser.avatarUrl}" alt="avatar">`
             : (commentUser?.username || '?').charAt(0).toUpperCase();
 
         commentDiv.innerHTML = `
-            <div class="avatar avatar-sm">${avatarContent}</div>
-            <div>
-                <strong>${esc(commentUser?.username || 'unknown')}</strong> <small>${timeAgo(comment.timestamp)}</small>
-                <p>${esc(comment.text)}</p>
+        <div class="avatar avatar-sm">${avatarContent}</div>
+        <div class="comment-body">
+            <div class="comment-top-row">
+                <div>
+                    <strong>${esc(commentUser?.username || 'unknown')}</strong>
+                    <small>${timeAgo(comment.timestamp)}</small>
+                </div>
+                ${comment.authorId === currentUser.id ? `<button class="comment-delete-btn" data-comment-id="${comment.id}">Delete</button>` : ''}
             </div>
-        `;
+            <p>${esc(comment.text)}</p>
+        </div>
+    `;
+
         const form = commentsList.querySelector('.comment-form');
         if (form) {
             commentsList.insertBefore(commentDiv, form);
         } else {
             commentsList.appendChild(commentDiv);
-        }    });
+        }
+
+        const deleteBtn = commentDiv.querySelector('.comment-delete-btn');
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteComment(comment.id);
+            });
+        }
+    });
 }
 
 /* ============================================================
@@ -166,12 +215,12 @@ function renderComments() {
 function toggleLike() {
     const postIndex = posts.findIndex(p => p.id === post.id);
     if (postIndex === -1) return;
-    
+
     posts[postIndex].likes = posts[postIndex].likes || [];
     const likeIndex = posts[postIndex].likes.indexOf(currentUser.id);
     const likeBtn = document.querySelector('.like-btn');
     const likeStat = document.querySelector('.post-stats span:first-child');
-    
+
     if (likeIndex === -1) {
         posts[postIndex].likes.push(currentUser.id);
         likeBtn.classList.add('liked');
@@ -181,7 +230,7 @@ function toggleLike() {
         likeBtn.classList.remove('liked');
         likeBtn.innerHTML = '❤️ Like';
     }
-    
+
     localStorage.setItem('posts', JSON.stringify(posts));
     if (likeStat) likeStat.textContent = `❤️ ${posts[postIndex].likes.length} likes`;
     //Post is updated after a like
@@ -195,38 +244,65 @@ function addComment() {
     const input = document.querySelector('.comment-form input');
     const text = input.value.trim();
     if (!text) return;
-    
+
     const postIndex = posts.findIndex(p => p.id === post.id);
     if (postIndex === -1) return;
-    
+
     const newComment = {
         id: 'c_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7),
         authorId: currentUser.id,
         text: text,
         timestamp: Date.now()
     };
-    
+
     posts[postIndex].comments = posts[postIndex].comments || [];
     posts[postIndex].comments.push(newComment);
-    
+
     localStorage.setItem('posts', JSON.stringify(posts));
-    
+
     // Clear input and reload comments
     input.value = '';
-    
+
     // Update stats
     const commentStat = document.querySelector('.post-stats span:last-child');
     if (commentStat) commentStat.textContent = `💬 ${posts[postIndex].comments.length} comments`;
-    
+
     // Update comments title
     const commentsTitle = document.querySelector('.comments h3');
     if (commentsTitle) commentsTitle.textContent = `Comments (${posts[postIndex].comments.length})`;
-    
+
     //Post is updated after a comment
     post.comments = posts[postIndex].comments;
     // Reload comments UI
     renderComments();
 }
+
+function deleteComment(commentId) {
+    const postIndex = posts.findIndex(p => p.id === post.id);
+    if (postIndex === -1) return;
+
+    posts[postIndex].comments = posts[postIndex].comments || [];
+    posts[postIndex].comments = posts[postIndex].comments.filter(c => c.id !== commentId);
+
+    localStorage.setItem('posts', JSON.stringify(posts));
+
+    // keep in-memory post object updated too
+    post.comments = posts[postIndex].comments;
+
+    // update counts
+    const commentStat = document.querySelector('.post-stats span:last-child');
+    if (commentStat) {
+        commentStat.textContent = `💬 ${post.comments.length} comments`;
+    }
+
+    const commentCount = document.getElementById('comment-count');
+    if (commentCount) {
+        commentCount.textContent = `(${post.comments.length})`;
+    }
+
+    renderComments();
+}
+
 
 /* ============================================================
    UPDATE SIDEBAR WITH CURRENT USER

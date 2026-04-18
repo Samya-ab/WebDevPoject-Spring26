@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
+<nav class="mobile-nav">
+    <a href="feed.html">🏠</a>
+    <a href="profile.html">👤</a>
+</nav>
+
 <body class="app-page">
     <!-- Top navigation -->
     <header class="app-header">
@@ -62,7 +67,7 @@
                     <span id="create-post-avatar" class="avatar avatar-sm"></span>
                     <textarea id="post-content" class="post-textarea" placeholder="What's on your mind?" maxlength="280"
                         rows="3"></textarea>
-                        <input type="url" id="post-image-url" placeholder="Image URL (optional)">
+                    <input type="file" id="post-image-file" accept="image/*">
                 </div>
 
                 <div class="create-post-actions">
@@ -102,6 +107,16 @@
 
     </main>
     <div id="toast"></div>
+    <div id="confirm-modal" class="confirm-overlay">
+        <div class="confirm-box">
+            <h3 id="confirm-title">Confirm action</h3>
+            <p id="confirm-message">Are you sure?</p>
+            <div class="confirm-actions">
+                <button id="confirm-cancel" class="btn btn-secondary" type="button">Cancel</button>
+                <button id="confirm-ok" class="btn btn-primary" type="button">Delete</button>
+            </div>
+        </div>
+    </div>
 
     <script src="javascript/feed.js"></script>
 </body>

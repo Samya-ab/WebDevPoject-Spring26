@@ -61,7 +61,7 @@
                 </header>
 
                 <p id="post-content" class="post-content"></p>
-                     <img id="post-image" style="display: none; max-width: 100%; border-radius: 12px; margin: 15px 0;">
+                <img id="post-image" style="display: none; max-width: 100%; border-radius: 12px; margin: 15px 0;">
 
 
                 <div class="post-stats">
@@ -84,6 +84,16 @@
                 </section>
             </article>
         </main>
+    </div>
+    <div id="confirm-modal" class="confirm-overlay">
+        <div class="confirm-box">
+            <h3 id="confirm-title">Confirm action</h3>
+            <p id="confirm-message">Are you sure?</p>
+            <div class="confirm-actions">
+                <button id="confirm-cancel" class="btn btn-secondary" type="button">Cancel</button>
+                <button id="confirm-ok" class="btn btn-primary" type="button">Delete</button>
+            </div>
+        </div>
     </div>
 
     <script src="javascript/post.js"></script>

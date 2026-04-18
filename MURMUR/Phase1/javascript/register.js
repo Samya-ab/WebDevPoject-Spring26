@@ -1,34 +1,60 @@
 const form = document.getElementById("register-f");
 
-form.addEventListener("submit", function(e) {
+function toast(msg) {
+    const t = document.getElementById('toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+        if (!file) {
+            resolve("");
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("Failed to read file"));
+        reader.readAsDataURL(file);
+    });
+}
+
+form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const username = document.getElementById("username").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
-    const fileInput=document.getElementById('profile');
-    const file=fileInput.files[0];
+    const fileInput = document.getElementById("profile");
+    const file = fileInput.files[0];
     let users = JSON.parse(localStorage.getItem("users")) || [];
 
-    // Validation for a new user register
     if (!username || !email || !password) {
-        alert("Please fill all fields");
+        toast("Please fill all fields");
         return;
     }
 
     if (!/\S+@\S+\.\S+/.test(email)) {
-        alert("Invalid email");
+        toast("Invalid email");
         return;
     }
 
     if (password.length < 6) {
-        alert("Password must be at least 6 characters");
+        toast("Password must be at least 6 characters");
         return;
     }
 
     if (users.some(u => u.email === email)) {
-        alert("Email already exists");
+        toast("Email already exists");
         return;
+    }
+
+    let avatarUrl = "";
+    if (file) {
+        avatarUrl = await fileToDataUrl(file);
     }
 
     const newUser = {
@@ -37,7 +63,7 @@ form.addEventListener("submit", function(e) {
         email,
         password,
         bio: "",
-        avatarUrl: "",
+        avatarUrl,
         bannerUrl: "",
         followers: [],
         following: []
@@ -46,7 +72,9 @@ form.addEventListener("submit", function(e) {
     users.push(newUser);
     localStorage.setItem("users", JSON.stringify(users));
 
-    alert("Account created!");
+    toast("Account created!");
 
-    window.location.href = "login.html";
+    setTimeout(() => {
+        window.location.href = "login.html";
+    }, 700);
 });
