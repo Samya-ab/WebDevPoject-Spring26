@@ -1,13 +1,86 @@
 // This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// learn more about it in the docs: https://pris.ly/d/prisma-s
+
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
   provider = "prisma-client-js"
-  output   = "client"
 }
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(cuid())
+  username    String    @unique
+  email       String    @unique
+  password    String
+  bio         String?
+  avatarUrl   String?
+  bannerUrl   String?
+  createdAt   DateTime  @default(now())
+  
+  // Relationships
+  posts       Post[]
+  comments    Comment[]
+  likes       Like[]
+  followers   Follow[]  @relation("follower")
+  following   Follow[]  @relation("following")
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  caption     String?
+  imageUrl    String?
+  createdAt   DateTime  @default(now())
+  
+  // Foreign keys
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  
+  // Relationships
+  comments    Comment[]
+  likes       Like[]
+}
+
+model Comment {
+  id          String    @id @default(cuid())
+  text        String
+  createdAt   DateTime  @default(now())
+  
+  // Foreign keys
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  postId      String
+  post        Post      @relation(fields: [postId], references: [id])
+}
+
+model Like {
+  id          String    @id @default(cuid())
+  
+  // Foreign keys
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  postId      String
+  post        Post      @relation(fields: [postId], references: [id])
+  
+  // Ensure one user can only like a post once
+  @@unique([userId, postId])
+}
+
+
+model Follow {
+  id          String    @id @default(cuid())
+  
+  // Foreign keys
+  followerId  String
+  follower    User      @relation("follower", fields: [followerId], references: [id])
+  followingId String
+  following   User      @relation("following", fields: [followingId], references: [id])
+  
+  // Ensure no duplicate follows
+  @@unique([followerId, followingId])
 }
