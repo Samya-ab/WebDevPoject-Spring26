@@ -2,7 +2,6 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-s
 
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
   provider = "prisma-client-js"
@@ -23,10 +22,9 @@ model User {
   bannerUrl   String?
   createdAt   DateTime  @default(now())
   
-  // Relationships
-  posts       Post[]
-  comments    Comment[]
-  likes       Like[]
+  posts       Post[]    
+  comments    Comment[] 
+  likes       Like[]    
   followers   Follow[]  @relation("follower")
   following   Follow[]  @relation("following")
 }
@@ -39,11 +37,10 @@ model Post {
   
   // Foreign keys
   authorId    String
-  author      User      @relation(fields: [authorId], references: [id])
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   
-  // Relationships
-  comments    Comment[]
-  likes       Like[]
+  comments    Comment[] 
+  likes       Like[]    
 }
 
 model Comment {
@@ -53,33 +50,35 @@ model Comment {
   
   // Foreign keys
   authorId    String
-  author      User      @relation(fields: [authorId], references: [id])
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   postId      String
-  post        Post      @relation(fields: [postId], references: [id])
+  post        Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model Like {
   id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now()) 
   
   // Foreign keys
   userId      String
-  user        User      @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   postId      String
-  post        Post      @relation(fields: [postId], references: [id])
+  post        Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
   
-  // Ensure one user can only like a post once
+  // Only like a post once
   @@unique([userId, postId])
 }
 
 
 model Follow {
   id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
   
   // Foreign keys
   followerId  String
-  follower    User      @relation("follower", fields: [followerId], references: [id])
+  follower    User      @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
   followingId String
-  following   User      @relation("following", fields: [followingId], references: [id])
+  following   User      @relation("following", fields: [followingId], references: [id],onDelete: Cascade)
   
   // Ensure no duplicate follows
   @@unique([followerId, followingId])
