@@ -4,7 +4,7 @@ import { faker } from "@faker-js/faker";
 const NEW_USERS = 30;
 const POSTS_PER_USER = () => faker.number.int({ min: 3, max: 15 });
 const COMMENT_PER_POST = () => faker.number.int({ min: 1, max: 30 });
-const FOLLOWS_PER_USER = () => faker.number.int({ min: 5, max: 25 })
+const FOLLOWS_PER_USER = () => faker.number.int({ min: 5, max: 25 });
 const LIKES_PER_USER = () => faker.number.int({ min: 0, max: 30 });
 
 
