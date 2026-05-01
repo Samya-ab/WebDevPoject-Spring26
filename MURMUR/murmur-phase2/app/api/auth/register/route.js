@@ -18,7 +18,7 @@ export async function POST(request) {
         const newUser = await createUser({
             username: body.username,
             email: body.email,
-            password: body.password,
+            password: hashedPass,
             bio: body.bio || "",
             avatarUrl: body.avatarUrl || "",
             bannerUrl: body.bannerUrl || "",
