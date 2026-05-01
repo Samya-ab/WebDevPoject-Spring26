@@ -1,3 +1,4 @@
+// @ts-nocheck
 const form = document.getElementById("register-f");
 
 function toast(msg) {
@@ -30,8 +31,8 @@ form.addEventListener("submit", async function (e) {
     const password = document.getElementById("password").value;
     const fileInput = document.getElementById("profile");
     const file = fileInput.files[0];
-    let users = JSON.parse(localStorage.getItem("users")) || [];
 
+    //Validating
     if (!username || !email || !password) {
         toast("Please fill all fields");
         return;
@@ -57,24 +58,38 @@ form.addEventListener("submit", async function (e) {
         avatarUrl = await fileToDataUrl(file);
     }
 
-    const newUser = {
-        id: "user_" + Date.now(),
-        username,
-        email,
-        password,
-        bio: "",
-        avatarUrl,
-        bannerUrl: "",
-        followers: [],
-        following: []
-    };
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username,
+                email,
+                password,
+                avatarUrl,
+                bio: "",
+                bannerUrl: ""
+            })
+        });
 
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
 
-    toast("Account created!");
+const data = await response.json();
 
-    setTimeout(() => {
-        window.location.href = "login.html";
-    }, 700);
+        if (!response.ok) {
+            toast(data.error || "Registration failed");
+            return;
+        }
+
+        toast("Account created!");
+
+        setTimeout(() => {
+            window.location.href = "login.html";
+        }, 700);
+
+    } catch (error) {
+        console.error('Register error:', error);
+        toast("Something went wrong. Please try again.");
+    }
 });
