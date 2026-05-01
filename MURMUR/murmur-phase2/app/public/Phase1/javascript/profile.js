@@ -67,8 +67,8 @@ async function api(path, options = {}) {
 /* ============================================================
    STATE
 ============================================================ */
-let currentUser = null;   // logged-in user object  (from /api/users/[id])
-let profileUser = null;   // user whose profile we're viewing
+let currentUser = null;
+let profileUser = null;
 let isOwnProfile = false;
 let activePostId = null;
 
