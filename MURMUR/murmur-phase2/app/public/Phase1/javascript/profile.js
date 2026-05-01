@@ -1,10 +1,6 @@
 /* ============================================================
    HELPERS
 ============================================================ */
-const ls = {
-  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
-  set: (k, v) => localStorage.setItem(k, JSON.stringify(v)),
-};
 function toast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
@@ -17,34 +13,21 @@ function showConfirm(message, onConfirm, title = 'Confirm action') {
   const messageEl = document.getElementById('confirm-message');
   const okBtn = document.getElementById('confirm-ok');
   const cancelBtn = document.getElementById('confirm-cancel');
-
   if (!modal || !titleEl || !messageEl || !okBtn || !cancelBtn) return;
-
   titleEl.textContent = title;
   messageEl.textContent = message;
   modal.classList.add('open');
-
   const closeModal = () => {
     modal.classList.remove('open');
-    okBtn.onclick = null;
-    cancelBtn.onclick = null;
-    modal.onclick = null;
+    okBtn.onclick = null; cancelBtn.onclick = null; modal.onclick = null;
   };
-
-  okBtn.onclick = () => {
-    closeModal();
-    onConfirm();
-  };
-
+  okBtn.onclick = () => { closeModal(); onConfirm(); };
   cancelBtn.onclick = closeModal;
-
-  modal.onclick = (e) => {
-    if (e.target === modal) closeModal();
-  };
+  modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 }
 
 function timeAgo(ts) {
-  const s = Math.floor((Date.now() - ts) / 1000);
+  const s = Math.floor((Date.now() - new Date(ts).getTime()) / 1000);
   if (s < 60) return s + 's ago';
   if (s < 3600) return Math.floor(s / 60) + 'm ago';
   if (s < 86400) return Math.floor(s / 3600) + 'h ago';
@@ -56,16 +39,9 @@ function fmtDate(ts) {
 function esc(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
-function uid() { return 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7); }
-
-
 function fileToDataUrl(file) {
   return new Promise((resolve, reject) => {
-    if (!file) {
-      resolve('');
-      return;
-    }
-
+    if (!file) { resolve(''); return; }
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
     reader.onerror = () => reject(new Error('Failed to read file'));
@@ -73,64 +49,26 @@ function fileToDataUrl(file) {
   });
 }
 
-
 /* ============================================================
-   SEED DEMO DATA
-   FIX: if users were already seeded by feed.html, we still
-   ensure a valid session exists (old code bailed out early
-   and never wrote the session, causing a redirect to login).
+   API WRAPPER  (uses credentials: 'include' to send the cookie)
 ============================================================ */
-function seedDemoData() {
-  const existingUsers = ls.get('users');
-
-  if (existingUsers && existingUsers.length > 0) {
-    /* Users already exist — just guarantee a session */
-    if (!ls.get('session')) ls.set('session', { userId: existingUsers[0].id });
-    return;
-  }
-
-  /* Fresh seed */
-  const me = 'user_demo_001';
-  ls.set('users', [
-    { id: me, username: 'haya_al', bio: 'Cybersecurity @ QU · CTF player\nFirewalls in Heels 👟', avatarUrl: 'https://i.pravatar.cc/100?img=47', bannerUrl: 'https://picsum.photos/seed/haya/600/200', followers: ['u2', 'u3', 'u4'], following: ['u2'] },
-    { id: 'u2', username: 'alice', bio: '', avatarUrl: 'https://i.pravatar.cc/100?img=5', bannerUrl: '', followers: [me], following: [me] },
-    { id: 'u3', username: 'bob', bio: '', avatarUrl: 'https://i.pravatar.cc/100?img=12', bannerUrl: '', followers: [me], following: [] },
-  ]);
-  ls.set('posts', [
-    { id: uid(), authorId: me, imageUrl: 'https://picsum.photos/seed/ctf/600/600', caption: 'CTF win this weekend! 🚩 The flag was hidden in metadata of a QR code inside a PCAP file. Wild.', timestamp: Date.now() - 259200000, likes: ['u2', 'u3', 'u4'], comments: [{ id: uid(), authorId: 'u2', text: 'WHAT that is insane!!', timestamp: Date.now() - 250000000 }] },
-    { id: uid(), authorId: me, imageUrl: 'https://picsum.photos/seed/cybermajlis/600/600', caption: 'Presented The Cyber Majlis at the booth today. Cultural cybersecurity education is the future.', timestamp: Date.now() - 172800000, likes: ['u2', 'u3'], comments: [] },
-    { id: uid(), authorId: me, imageUrl: 'https://picsum.photos/seed/ccna/600/600', caption: 'Just passed my CCNA exam! Months of late-night labs finally paid off.', timestamp: Date.now() - 86400000, likes: ['u2', 'u3', 'u4'], comments: [{ id: uid(), authorId: 'u3', text: 'Congratulations!!', timestamp: Date.now() - 80000000 }] },
-    { id: uid(), authorId: me, imageUrl: 'https://picsum.photos/seed/firewalls/600/600', caption: 'New Firewalls in Heels post up! Episode 02: WhatsApp privacy settings you need to change RIGHT NOW. Link in bio.', timestamp: Date.now() - 7200000, likes: ['u2'], comments: [] },
-    { id: uid(), authorId: me, imageUrl: 'https://picsum.photos/seed/lab/600/600', caption: 'Running SEED Labs at 2am is a vibe. Why does everything click at midnight', timestamp: Date.now() - 3600000, likes: [], comments: [] },
-    { id: uid(), authorId: me, imageUrl: 'https://picsum.photos/seed/quantum/600/600', caption: 'Built a quantum randomizer class in Qiskit today for the UREP research. Dr. Noora is going to love this.', timestamp: Date.now() - 1800000, likes: ['u2'], comments: [] },
-  ]);
-  // ls.set('session', { userId: me }); 
-  /* YARA:commented this until I check validation, no auto login */
-
-  if (!ls.get('session')) {
-    return;
-  }
-
-}
-
-
-/* ============================================================
-   BOOTSTRAP
-============================================================ */
-function bootstrap() {
-  seedDemoData();
-  if (!ls.get('users')) ls.set('users', []);
-  if (!ls.get('posts')) ls.set('posts', []);
-  if (!ls.get('session')) { window.location.href = 'login.html'; return false; }
-  return true;
+async function api(path, options = {}) {
+  const res = await fetch(path, {
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    ...options,
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(data?.error || 'Something went wrong');
+  return data;
 }
 
 
 /* ============================================================
    STATE
 ============================================================ */
-let currentUser = null;
-let profileUser = null;
+let currentUser = null;   // logged-in user object  (from /api/users/[id])
+let profileUser = null;   // user whose profile we're viewing
 let isOwnProfile = false;
 let activePostId = null;
 
@@ -138,63 +76,61 @@ let activePostId = null;
 /* ============================================================
    INIT
 ============================================================ */
-function init() {
-  if (!bootstrap()) return;
-  const session = ls.get('session');
-  const users = ls.get('users') || [];
-  currentUser = users.find(u => u.id === session.userId);
-  if (!currentUser) { window.location.href = 'login.html'; return; }
+async function init() {
+  const meId = getCookieValue('userId');
+  if (!meId) { window.location.href = 'login.html'; return; }
+
+  try {
+    currentUser = await api(`/api/users/${meId}`);
+  } catch {
+    window.location.href = 'login.html'; return;
+  }
 
   const params = new URLSearchParams(window.location.search);
-  const targetId = params.get('uid') || currentUser.id;
-  profileUser = users.find(u => u.id === targetId) || currentUser;
+  const targetId = params.get('uid') || meId;
+  try {
+    profileUser = await api(`/api/users/${targetId}`);
+  } catch {
+    profileUser = currentUser;
+  }
   isOwnProfile = (profileUser.id === currentUser.id);
+
 
   renderProfile();
   renderPosts();
 
-  /* Logout */
-  document.getElementById('logout-btn').addEventListener('click', () => {
-    localStorage.removeItem('session');
+
+  document.getElementById('logout-btn').addEventListener('click', async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => { });
     window.location.href = 'login.html';
   });
 
-  /* Nav search — Enter navigates to feed */
   const searchInput = document.getElementById('search-input');
   const searchResults = document.getElementById('search-results');
-
   let debounceTimeout;
+
   searchInput.addEventListener('input', (e) => {
     clearTimeout(debounceTimeout);
-    const query = e.target.value.trim().toLowerCase();
-    if (!query) {
-      searchResults.hidden = true;
-      searchResults.innerHTML = '';
-      return;
-    }
-    debounceTimeout = setTimeout(() => {
-      const users = ls.get('users') || [];
-      const matches = users.filter(
-        u => u.username.toLowerCase().includes(query) && u.id !== currentUser.id
-      );
-      if (matches.length === 0) {
-        searchResults.innerHTML = '<li style="padding: 8px;">No users found</li>';
-        searchResults.hidden = false;
-        return;
-      }
-      searchResults.innerHTML = '';
-      matches.forEach(user => {
-        const li = document.createElement('li');
-        li.style.padding = '8px';
-        li.style.cursor = 'pointer';
-        li.style.borderBottom = '1px solid var(--color-border)';
-        li.textContent = `@${user.username}`;
-        li.addEventListener('click', () => {
-          window.location.href = `profile.html?uid=${user.id}`;
+    const query = e.target.value.trim();
+    if (!query) { searchResults.hidden = true; searchResults.innerHTML = ''; return; }
+
+    debounceTimeout = setTimeout(async () => {
+      try {
+        const users = await api(`/api/users/search?q=${encodeURIComponent(query)}`);
+        if (!users.length) {
+          searchResults.innerHTML = '<li style="padding:8px">No users found</li>';
+          searchResults.hidden = false; return;
+        }
+        searchResults.innerHTML = '';
+        users.forEach(user => {
+          const li = document.createElement('li');
+          li.style.cssText = 'padding:8px;cursor:pointer;border-bottom:1px solid var(--color-border)';
+          li.textContent = '@' + user.username;
+          li.addEventListener('click', () => { window.location.href = `profile.html?uid=${user.id}`; });
+          searchResults.appendChild(li);
         });
-        searchResults.appendChild(li);
-      });
-      searchResults.hidden = false;
+        searchResults.hidden = false;
+      } catch { /* ignore search errors */ }
     }, 300);
   });
 
@@ -202,34 +138,33 @@ function init() {
     if (e.key === 'Enter' && e.target.value.trim())
       window.location.href = 'feed.html?q=' + encodeURIComponent(e.target.value.trim());
   });
-
   document.addEventListener('click', (e) => {
-    if (!searchResults.contains(e.target) && e.target !== searchInput) {
-      searchResults.hidden = true;
-    }
+    if (!searchResults.contains(e.target) && e.target !== searchInput) searchResults.hidden = true;
   });
 
-  /* Close modals on overlay click */
+  /* Modal close on overlay click */
   document.getElementById('post-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
   document.getElementById('add-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeAddModal(); });
 
-  /* Comment: Enter submits, input enables/disables button */
+  /* Comment input */
   document.getElementById('comment-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitComment(); });
   document.getElementById('comment-input').addEventListener('input', e => {
     document.getElementById('comment-submit-btn').disabled = !e.target.value.trim();
   });
 
-  /* Live image preview in add-post modal */
+  /* Image preview & caption counter */
   document.getElementById('post-img-file').addEventListener('change', previewImage);
-
-  /* Caption character counter */
   document.getElementById('post-caption').addEventListener('input', function () {
     document.getElementById('caption-counter').textContent = this.value.length + ' / 300';
   });
 
-  /* Edit form */
   document.getElementById('save-edit-btn').addEventListener('click', saveProfile);
   document.getElementById('cancel-edit-btn').addEventListener('click', hideEditForm);
+}
+
+function getCookieValue(name) {
+  const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
 }
 
 
@@ -238,7 +173,7 @@ function init() {
 ============================================================ */
 function renderProfile() {
   const banner = document.getElementById('cover-banner');
-  banner.style.backgroundImage = profileUser.bannerUrl ? 'url(' + profileUser.bannerUrl + ')' : '';
+  banner.style.backgroundImage = profileUser.bannerUrl ? `url(${profileUser.bannerUrl})` : '';
 
   if (profileUser.avatarUrl) {
     document.getElementById('avatar-img').src = profileUser.avatarUrl;
@@ -252,13 +187,13 @@ function renderProfile() {
   document.getElementById('profile-username').textContent = '@' + profileUser.username;
   document.getElementById('profile-bio').textContent = profileUser.bio || 'No bio yet.';
 
-  const posts = ls.get('posts') || [];
-  document.getElementById('stat-posts').textContent = posts.filter(p => p.authorId === profileUser.id).length;
-  document.getElementById('stat-followers').textContent = (profileUser.followers || []).length;
-  document.getElementById('stat-following').textContent = (profileUser.following || []).length;
+  document.getElementById('stat-posts').textContent = profileUser._count?.posts ?? 0;
+  document.getElementById('stat-followers').textContent = profileUser._count?.followers ?? 0;
+  document.getElementById('stat-following').textContent = profileUser._count?.following ?? 0;
 
   const area = document.getElementById('action-btns');
   area.innerHTML = '';
+
   if (isOwnProfile) {
     const editBtn = document.createElement('button');
     editBtn.className = 'btn btn-secondary';
@@ -273,7 +208,7 @@ function renderProfile() {
     area.appendChild(editBtn);
     area.appendChild(newBtn);
   } else {
-    const isFollowing = (currentUser.following || []).includes(profileUser.id);
+    const isFollowing = profileUser.isFollowedByMe ?? false;
     const btn = document.createElement('button');
     btn.className = 'btn ' + (isFollowing ? 'btn-secondary' : 'btn-primary');
     btn.textContent = isFollowing ? 'Following' : 'Follow';
@@ -286,23 +221,23 @@ function renderProfile() {
 /* ============================================================
    FOLLOW / UNFOLLOW
 ============================================================ */
-function toggleFollow(btn) {
-  const users = ls.get('users') || [];
-  const cu = users.find(u => u.id === currentUser.id);
-  const pu = users.find(u => u.id === profileUser.id);
-  cu.following = cu.following || []; pu.followers = pu.followers || [];
-  const idx = cu.following.indexOf(pu.id);
-  if (idx === -1) {
-    cu.following.push(pu.id); pu.followers.push(cu.id);
-    btn.textContent = 'Following'; btn.className = 'btn btn-secondary';
-    toast('Followed @' + pu.username);
-  } else {
-    cu.following.splice(idx, 1); pu.followers.splice(pu.followers.indexOf(cu.id), 1);
-    btn.textContent = 'Follow'; btn.className = 'btn btn-primary';
-    toast('Unfollowed @' + pu.username);
+async function toggleFollow(btn) {
+  try {
+    const result = await api(`/api/follows/${profileUser.id}`, { method: 'POST' });
+    const nowFollowing = result.following;
+
+    btn.textContent = nowFollowing ? 'Following' : 'Follow';
+    btn.className = 'btn ' + (nowFollowing ? 'btn-secondary' : 'btn-primary');
+    profileUser.isFollowedByMe = nowFollowing;
+
+    const fresh = await api(`/api/users/${profileUser.id}`);
+    profileUser = fresh;
+    document.getElementById('stat-followers').textContent = fresh._count?.followers ?? 0;
+
+    toast(nowFollowing ? 'Followed @' + profileUser.username : 'Unfollowed @' + profileUser.username);
+  } catch (err) {
+    toast(err.message);
   }
-  ls.set('users', users); currentUser = cu; profileUser = pu;
-  document.getElementById('stat-followers').textContent = pu.followers.length;
 }
 
 
@@ -319,20 +254,27 @@ function showEditForm() {
 }
 function hideEditForm() { document.getElementById('edit-form').style.display = 'none'; }
 
-function saveProfile() {
+async function saveProfile() {
   const newUsername = document.getElementById('edit-username').value.trim();
   if (!newUsername) { toast('Username cannot be empty'); return; }
-  const users = ls.get('users') || [];
-  const idx = users.findIndex(u => u.id === profileUser.id);
-  if (idx === -1) return;
-  if (users.some(u => u.username === newUsername && u.id !== profileUser.id)) { toast('Username already taken'); return; }
-  users[idx].username = newUsername;
-  users[idx].bio = document.getElementById('edit-bio').value.trim();
-  users[idx].avatarUrl = document.getElementById('edit-avatar').value.trim();
-  users[idx].bannerUrl = document.getElementById('edit-banner').value.trim();
-  ls.set('users', users);
-  currentUser = profileUser = users[idx];
-  renderProfile(); hideEditForm(); toast('Profile saved');
+
+  try {
+    const updated = await api(`/api/users/${profileUser.id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: newUsername,
+        bio: document.getElementById('edit-bio').value.trim(),
+        avatarUrl: document.getElementById('edit-avatar').value.trim(),
+        bannerUrl: document.getElementById('edit-banner').value.trim(),
+      }),
+    });
+    currentUser = profileUser = updated;
+    renderProfile();
+    hideEditForm();
+    toast('Profile saved');
+  } catch (err) {
+    toast(err.message);
+  }
 }
 
 
@@ -351,61 +293,75 @@ function switchTab(tab) {
 /* ============================================================
    POSTS GRID
 ============================================================ */
-function renderPosts() {
-  const posts = (ls.get('posts') || [])
-    .filter(p => p.authorId === profileUser.id)
-    .sort((a, b) => b.timestamp - a.timestamp);
+async function renderPosts() {
   const grid = document.getElementById('posts-grid');
-  grid.innerHTML = '';
-  if (!posts.length) {
-    grid.innerHTML =
-      '<div class="empty-state">' +
-      '<div class="ei">&#x1F4F7;</div>' +
-      '<p>' + (isOwnProfile ? 'No posts yet.' : '@' + esc(profileUser.username) + ' hasn\'t posted yet.') + '</p>' +
-      '</div>';
-    return;
+  grid.innerHTML = '<p style="color:var(--color-text-muted);padding:8px">Loading…</p>';
+
+  try {
+    const allPosts = await api('/api/posts');
+    const posts = allPosts
+      .filter(p => p.authorId === profileUser.id)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    grid.innerHTML = '';
+    document.getElementById('stat-posts').textContent = posts.length;
+
+    if (!posts.length) {
+      grid.innerHTML =
+        '<div class="empty-state"><div class="ei">&#x1F4F7;</div>' +
+        '<p>' + (isOwnProfile ? 'No posts yet.' : '@' + esc(profileUser.username) + ' hasn\'t posted yet.') + '</p></div>';
+      return;
+    }
+    posts.forEach(p => grid.appendChild(makeThumb(p)));
+  } catch (err) {
+    grid.innerHTML = '<p style="color:red;padding:8px">' + esc(err.message) + '</p>';
   }
-  document.getElementById('stat-posts').textContent = posts.length;
-  posts.forEach(p => grid.appendChild(makeThumb(p)));
 }
 
-function renderLikedPosts() {
-  const posts = (ls.get('posts') || [])
-    .filter(p => (p.likes || []).includes(currentUser.id))
-    .sort((a, b) => b.timestamp - a.timestamp);
+async function renderLikedPosts() {
   const grid = document.getElementById('liked-grid');
-  grid.innerHTML = '';
-  if (!posts.length) {
-    grid.innerHTML = '<div class="empty-state"><div class="ei">&#x2764;&#xFE0F;</div><p>No liked posts yet.</p></div>';
-    return;
+  grid.innerHTML = '<p style="color:var(--color-text-muted);padding:8px">Loading…</p>';
+
+  try {
+    const allPosts = await api('/api/posts');
+    const liked = allPosts
+      .filter(p => p.likedByMe)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+    grid.innerHTML = '';
+    if (!liked.length) {
+      grid.innerHTML = '<div class="empty-state"><div class="ei">&#x2764;&#xFE0F;</div><p>No liked posts yet.</p></div>';
+      return;
+    }
+    liked.forEach(p => grid.appendChild(makeThumb(p)));
+  } catch (err) {
+    grid.innerHTML = '<p style="color:red;padding:8px">' + esc(err.message) + '</p>';
   }
-  posts.forEach(p => grid.appendChild(makeThumb(p)));
 }
 
 function makeThumb(post) {
   const div = document.createElement('div');
   div.className = 'post-thumb';
+  const likeCount = post._count?.likes ?? post.likes?.length ?? 0;
+  const commentCount = post._count?.comments ?? post.comments?.length ?? 0;
+
   if (post.imageUrl) {
     div.innerHTML =
       '<img src="' + esc(post.imageUrl) + '" loading="lazy" />' +
       '<div class="thumb-overlay">' +
-      '<span class="thumb-stat">&#x2764;&#xFE0F; ' + (post.likes || []).length + '</span>' +
-      '<span class="thumb-stat">&#x1F4AC; ' + (post.comments || []).length + '</span>' +
-      '</div>';
+      '<span class="thumb-stat">&#x2764;&#xFE0F; ' + likeCount + '</span>' +
+      '<span class="thumb-stat">&#x1F4AC; ' + commentCount + '</span></div>';
   } else {
     div.innerHTML =
       '<div class="thumb-text">' + esc(post.caption || '') + '</div>' +
       '<div class="thumb-overlay">' +
-      '<span class="thumb-stat">&#x2764;&#xFE0F; ' + (post.likes || []).length + '</span>' +
-      '<span class="thumb-stat">&#x1F4AC; ' + (post.comments || []).length + '</span>' +
-      '</div>';
+      '<span class="thumb-stat">&#x2764;&#xFE0F; ' + likeCount + '</span>' +
+      '<span class="thumb-stat">&#x1F4AC; ' + commentCount + '</span></div>';
   }
-  // CHANGE: go to post.html instead of opening modal
-  div.onclick = () => {
-    window.location.href = 'post.html?id=' + post.id;
-  };
+  div.onclick = () => { window.location.href = 'post.html?id=' + post.id; };
   return div;
 }
+
 
 /* ============================================================
    ADD POST MODAL
@@ -418,109 +374,84 @@ function openAddModal() {
   document.getElementById('img-ph').style.display = 'flex';
   document.getElementById('add-modal').classList.add('open');
 }
-
-function closeAddModal() {
-  document.getElementById('add-modal').classList.remove('open');
-}
+function closeAddModal() { document.getElementById('add-modal').classList.remove('open'); }
 
 function previewImage() {
-  const fileInput = document.getElementById('post-img-file');
-  const file = fileInput.files[0];
+  const file = document.getElementById('post-img-file').files[0];
   const img = document.getElementById('preview-img');
   const ph = document.getElementById('img-ph');
-
-  if (!file) {
-    img.style.display = 'none';
-    img.src = '';
-    ph.style.display = 'flex';
-    return;
-  }
-
+  if (!file) { img.style.display = 'none'; img.src = ''; ph.style.display = 'flex'; return; }
   const reader = new FileReader();
-  reader.onload = () => {
-    img.src = reader.result;
-    img.style.display = 'block';
-    ph.style.display = 'none';
-  };
-  reader.onerror = () => {
-    img.style.display = 'none';
-    img.src = '';
-    ph.style.display = 'flex';
-  };
+  reader.onload = () => { img.src = reader.result; img.style.display = 'block'; ph.style.display = 'none'; };
+  reader.onerror = () => { img.style.display = 'none'; img.src = ''; ph.style.display = 'flex'; };
   reader.readAsDataURL(file);
 }
 
 async function submitPost() {
-  const fileInput = document.getElementById('post-img-file');
-  const file = fileInput.files[0];
+  const file = document.getElementById('post-img-file').files[0];
   const caption = document.getElementById('post-caption').value.trim();
 
-  if (!caption && !file) {
-    toast('Add an image or a caption');
-    return;
-  }
+  if (!caption && !file) { toast('Add an image or a caption'); return; }
 
   let imageUrl = '';
-  if (file) {
-    imageUrl = await fileToDataUrl(file);
+  if (file) imageUrl = await fileToDataUrl(file);
+
+  try {
+    await api('/api/posts', {
+      method: 'POST',
+      body: JSON.stringify({ caption, imageUrl }),
+    });
+    closeAddModal();
+    renderPosts();
+    toast('Post shared!');
+  } catch (err) {
+    toast(err.message);
   }
-
-  const posts = ls.get('posts') || [];
-  posts.unshift({
-    id: uid(),
-    authorId: currentUser.id,
-    imageUrl,
-    caption,
-    timestamp: Date.now(),
-    likes: [],
-    comments: [],
-  });
-
-  ls.set('posts', posts);
-  closeAddModal();
-  renderPosts();
-  toast('Post shared!');
 }
 
 
 /* ============================================================
    POST DETAIL MODAL
 ============================================================ */
-function openModal(postId) {
-  const posts = ls.get('posts') || [];
-  const post = posts.find(p => p.id === postId);
-  if (!post) return;
+async function openModal(postId) {
   activePostId = postId;
 
-  const users = ls.get('users') || [];
-  const author = users.find(u => u.id === post.authorId) || { username: 'unknown', avatarUrl: '' };
+  try {
+    /* GET /api/posts/[id] — returns post with author, comments, likedByMe */
+    const post = await api(`/api/posts/${postId}`);
 
-  const pmiImg = document.getElementById('pmi-img');
-  const pmiNoImg = document.getElementById('pmi-no-image');
-  if (post.imageUrl) {
-    pmiImg.src = post.imageUrl; pmiImg.style.display = 'block'; pmiNoImg.style.display = 'none';
-  } else {
-    pmiImg.style.display = 'none'; pmiNoImg.style.display = 'flex';
+    const author = post.author || { username: 'unknown', avatarUrl: '' };
+
+    const pmiImg = document.getElementById('pmi-img');
+    const pmiNoImg = document.getElementById('pmi-no-image');
+    if (post.imageUrl) {
+      pmiImg.src = post.imageUrl; pmiImg.style.display = 'block'; pmiNoImg.style.display = 'none';
+    } else {
+      pmiImg.style.display = 'none'; pmiNoImg.style.display = 'flex';
+    }
+
+    document.getElementById('pmi-author').textContent = '@' + author.username;
+    document.getElementById('pmi-time').textContent = fmtDate(post.createdAt);
+    document.getElementById('pmi-av-inner').innerHTML = author.avatarUrl
+      ? '<img src="' + esc(author.avatarUrl) + '" />' : '&#x1F464;';
+
+    document.getElementById('pmi-caption').innerHTML =
+      '<span class="pmi-caption-author">@' + esc(author.username) + '</span>' + esc(post.caption || '');
+
+    const liked = post.likedByMe ?? false;
+    const likeCount = post._count?.likes ?? 0;
+    document.getElementById('pmi-like-icon').textContent = liked ? '\u2764\uFE0F' : '\u{1F90D}';
+    document.getElementById('pmi-like-count').textContent = likeCount;
+    document.getElementById('pmi-like-btn').className = 'pmi-like-btn' + (liked ? ' liked' : '');
+    document.getElementById('pmi-del-btn').style.display = post.authorId === currentUser.id ? 'inline' : 'none';
+
+    renderModalComments(post.comments || []);
+    document.getElementById('post-modal').classList.add('open');
+    document.getElementById('comment-input').value = '';
+    document.getElementById('comment-submit-btn').disabled = true;
+  } catch (err) {
+    toast(err.message);
   }
-
-  document.getElementById('pmi-author').textContent = '@' + author.username;
-  document.getElementById('pmi-time').textContent = fmtDate(post.timestamp);
-  document.getElementById('pmi-av-inner').innerHTML = author.avatarUrl
-    ? '<img src="' + esc(author.avatarUrl) + '" />' : '&#x1F464;';
-
-  document.getElementById('pmi-caption').innerHTML =
-    '<span class="pmi-caption-author">@' + esc(author.username) + '</span>' + esc(post.caption || '');
-
-  const liked = (post.likes || []).includes(currentUser.id);
-  document.getElementById('pmi-like-icon').textContent = liked ? '\u2764\uFE0F' : '\u{1F90D}';
-  document.getElementById('pmi-like-count').textContent = (post.likes || []).length;
-  document.getElementById('pmi-like-btn').className = 'pmi-like-btn' + (liked ? ' liked' : '');
-  document.getElementById('pmi-del-btn').style.display = post.authorId === currentUser.id ? 'inline' : 'none';
-
-  renderModalComments(post);
-  document.getElementById('post-modal').classList.add('open');
-  document.getElementById('comment-input').value = '';
-  document.getElementById('comment-submit-btn').disabled = true;
 }
 
 function closeModal() {
@@ -528,23 +459,21 @@ function closeModal() {
   activePostId = null;
 }
 
-function renderModalComments(post) {
-  const users = ls.get('users') || [];
+function renderModalComments(comments) {
   const container = document.getElementById('pmi-comments');
-  const comments = post.comments || [];
   if (!comments.length) {
     container.innerHTML = '<p style="color:var(--color-text-muted);font-size:12px;padding:4px 0">No comments yet. Be the first!</p>';
     return;
   }
   container.innerHTML = '';
   comments.forEach(c => {
-    const u = users.find(u => u.id === c.authorId) || { username: '?' };
+    const author = c.author || { username: '?' };
     const d = document.createElement('div');
     d.className = 'pmi-comment-item';
     d.innerHTML =
-      '<div><span class="pmi-comment-author">@' + esc(u.username) + '</span>' +
+      '<div><span class="pmi-comment-author">@' + esc(author.username) + '</span>' +
       '<span>' + esc(c.text) + '</span>' +
-      '<div class="pmi-comment-ts">' + timeAgo(c.timestamp) + '</div></div>';
+      '<div class="pmi-comment-ts">' + timeAgo(c.createdAt) + '</div></div>';
     container.appendChild(d);
   });
   container.scrollTop = container.scrollHeight;
@@ -554,21 +483,22 @@ function renderModalComments(post) {
 /* ============================================================
    LIKE
 ============================================================ */
-function modalToggleLike() {
-  const posts = ls.get('posts') || [];
-  const idx = posts.findIndex(p => p.id === activePostId);
-  if (idx === -1) return;
-  posts[idx].likes = posts[idx].likes || [];
-  const li = posts[idx].likes.indexOf(currentUser.id);
-  const liked = li === -1;
-  if (liked) posts[idx].likes.push(currentUser.id);
-  else posts[idx].likes.splice(li, 1);
-  ls.set('posts', posts);
-  document.getElementById('pmi-like-count').textContent = posts[idx].likes.length;
-  document.getElementById('pmi-like-icon').textContent = liked ? '\u2764\uFE0F' : '\u{1F90D}';
-  document.getElementById('pmi-like-btn').className = 'pmi-like-btn' + (liked ? ' liked' : '');
-  renderPosts();
-  if (document.getElementById('liked-section').style.display !== 'none') renderLikedPosts();
+async function modalToggleLike() {
+  try {
+    /* POST /api/posts/[id]/like — returns { liked: bool, likeCount: number } */
+    const result = await api(`/api/posts/${activePostId}/like`, { method: 'POST' });
+    const liked = result.liked;
+    const likeCount = result.likeCount ?? parseInt(document.getElementById('pmi-like-count').textContent, 10) + (liked ? 1 : -1);
+
+    document.getElementById('pmi-like-count').textContent = likeCount;
+    document.getElementById('pmi-like-icon').textContent = liked ? '\u2764\uFE0F' : '\u{1F90D}';
+    document.getElementById('pmi-like-btn').className = 'pmi-like-btn' + (liked ? ' liked' : '');
+
+    renderPosts();
+    if (document.getElementById('liked-section').style.display !== 'none') renderLikedPosts();
+  } catch (err) {
+    toast(err.message);
+  }
 }
 
 
@@ -576,11 +506,15 @@ function modalToggleLike() {
    DELETE POST
 ============================================================ */
 function deletePost() {
-  showConfirm('Delete this post? This cannot be undone.', () => {
-    ls.set('posts', (ls.get('posts') || []).filter(p => p.id !== activePostId));
-    closeModal();
-    renderPosts();
-    toast('Post deleted');
+  showConfirm('Delete this post? This cannot be undone.', async () => {
+    try {
+      await api(`/api/posts/${activePostId}`, { method: 'DELETE' });
+      closeModal();
+      renderPosts();
+      toast('Post deleted');
+    } catch (err) {
+      toast(err.message);
+    }
   }, 'Delete post');
 }
 
@@ -588,24 +522,29 @@ function deletePost() {
 /* ============================================================
    ADD COMMENT
 ============================================================ */
-function submitComment() {
+async function submitComment() {
   const input = document.getElementById('comment-input');
   const text = input.value.trim();
   if (!text) return;
-  const posts = ls.get('posts') || [];
-  const idx = posts.findIndex(p => p.id === activePostId);
-  if (idx === -1) return;
-  posts[idx].comments = posts[idx].comments || [];
-  posts[idx].comments.push({ id: uid(), authorId: currentUser.id, text, timestamp: Date.now() });
-  ls.set('posts', posts);
-  input.value = '';
-  document.getElementById('comment-submit-btn').disabled = true;
-  renderModalComments(posts[idx]);
-  renderPosts();
+
+  try {
+    /* POST /api/posts/[id]/comments — returns the new comment */
+    await api(`/api/posts/${activePostId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ text }),
+    });
+
+    input.value = '';
+    document.getElementById('comment-submit-btn').disabled = true;
+
+    /* Re-fetch the post to get fresh comments */
+    const post = await api(`/api/posts/${activePostId}`);
+    renderModalComments(post.comments || []);
+    renderPosts();
+  } catch (err) {
+    toast(err.message);
+  }
 }
 
 
 document.addEventListener('DOMContentLoaded', init);
-
-
-
