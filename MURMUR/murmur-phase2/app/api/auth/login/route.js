@@ -16,7 +16,8 @@ export async function POST(request) {
 
             );
         }
-        const user = await getUserByEmail(body.email);
+        const result = await getUserByEmail(body.email);
+        const user = result.data;
         if(!user){
             return NextResponse.json(
                 {error:"Invalid"},
