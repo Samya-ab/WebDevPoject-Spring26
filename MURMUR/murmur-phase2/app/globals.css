@@ -299,6 +299,22 @@ button:active {
     gap: 16px;
 }
 
+.suggestion-item {
+    min-width: 0;
+}
+
+.suggestion-item > div {
+    min-width: 0;
+    overflow: hidden;
+}
+
+.suggestion-item strong,
+.suggestion-item div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 
 .create-post-box {
     background-color: var(--color-surface);
@@ -559,6 +575,7 @@ button:active {
 
 
 
+
 .s-container {
     background: var(--color-surface-2);
     width: 100%;
@@ -570,6 +587,7 @@ button:active {
     flex-direction: column;
     gap: 1.8rem;
     margin: 0 auto;
+    margin-top: 6vh;        
 }
 
 .s-container h1 {

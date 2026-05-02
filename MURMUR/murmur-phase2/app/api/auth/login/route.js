@@ -1,38 +1,35 @@
 import { NextResponse } from "next/server";
-import bcrypt from 'bcryptjs';
 import { createUser, getUserByEmail } from '@/repos/users.js';
-import { error } from "node:console";
 import { cookies } from "next/headers";
 //POST /api/
 export async function POST(request) {
     try {
         const body = await request.json();
-        const required=['email','password' ];
-        const m=required.filter(f=>!body[f]);
-        if(m.length>0){
+        const required = ['email', 'password'];
+        const m = required.filter(f => !body[f]);
+        if (m.length > 0) {
             return NextResponse.json(
-                {error: "Missing:"},
+                { error: "Missing:" },
                 { status: 400 }
 
             );
         }
         const result = await getUserByEmail(body.email);
         const user = result.data;
-        if(!user){
+        if (!user) {
             return NextResponse.json(
-                {error:"Invalid"},
-                {status:401}
+                { error: "Invalid" },
+                { status: 401 }
             );
         }
 
-        const isvalid=await bcrypt.compare(body.password,user.password);
-        if(!isvalid){
+        if (body.password !== user.password) {
             return NextResponse.json(
-                {error:"Invalid"},
-                {status:401}
+                { error: "Invalid" },
+                { status: 401 }
             );
         }
-        (await cookies()).set('userId', user.id,{
+        (await cookies()).set('userId', user.id, {
             httpOnly: true,
             secure: false,
             sameSite: 'lax',
@@ -41,20 +38,21 @@ export async function POST(request) {
         });
         const { password: _, ...userWithoutPass } = user;
         return NextResponse.json({
-            user:userWithoutPass,
-            userId:user.id},
-            {status:200});
+            user: userWithoutPass,
+            userId: user.id
+        },
+            { status: 200 });
 
 
-    }catch (error) {
-        console.error('Login error: ',error);
+    } catch (error) {
+        console.error('Login error: ', error);
         return NextResponse.json(
-                {error: "Invalid"},
-                { status: 400 }
+            { error: "Invalid" },
+            { status: 400 }
 
-            );
+        );
 
-        
+
     }
 
 }

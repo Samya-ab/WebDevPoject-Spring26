@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { error } from "node:console";
 import { toggleFollow, isFollowing } from "@/repos/follows.js";
 import { getUserById } from "@/repos/users.js";
 import { cookies } from "next/headers";
@@ -7,7 +6,7 @@ import { cookies } from "next/headers";
 
 export async function GET(request, { params }) {
     const { id } = await params;
-    const { searchParams } = await params;
+    const { searchParams } = new URL(request.url);
     const followID = searchParams.get("followerID");
 
     if (!followID) {

@@ -48,11 +48,6 @@ form.addEventListener("submit", async function (e) {
         return;
     }
 
-    if (users.some(u => u.email === email)) {
-        toast("Email already exists");
-        return;
-    }
-
     let avatarUrl = "";
     if (file) {
         avatarUrl = await fileToDataUrl(file);

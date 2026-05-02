@@ -1,7 +1,7 @@
 // @ts-nocheck
 const form = document.getElementById("login-f");
 
-form.addEventListener("submit", function(e) {
+form.addEventListener("submit", async function (e) {
     e.preventDefault();
 
     const email = form.querySelector("input[type='email']").value.trim();
@@ -24,10 +24,10 @@ form.addEventListener("submit", function(e) {
             return;
         }
 
-
+        localStorage.setItem("currentUserId", data.userId);
 
         //Directing to feed page:
-        window.location.href = "/feed.html";
+        window.location.href = "feed.html";
 
     } catch (error) {
         console.error('Login error:', error);

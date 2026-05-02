@@ -1,13 +1,16 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getEveryoneFeed, createPost } from "@/repos/posts.js";
 
-//Get /api/posts
 export async function GET(request) {
-    const{searchParams} =new URL (request.URL);
-    const currentUserID=searchParams.get("currentUserID");
-    const result=await getEveryoneFeed(currentUserID);
-    
+    const cookieStore = await cookies();
+    const currentUserID = cookieStore.get("userId")?.value;
 
+    if (!currentUserID) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const result = await getEveryoneFeed(currentUserID);
 
     if (result.error) {
         return NextResponse.json(
@@ -18,17 +21,23 @@ export async function GET(request) {
 
     return NextResponse.json(result.data);
 }
-    
 
-//Post/api/posts
 export async function POST(request) {
-    const body = await request.json();
-    const {authorId, caption, imageUrl}=body;
+    const cookieStore = await cookies();
+    const authorId = cookieStore.get("userId")?.value;
 
-    if (!authorId || ! caption) {
-        return NextResponse.json({ error: "AuthorID and Caption Required" }, { status: 400 });
+    if (!authorId) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const result = await createPost(authorId, {caption, imageUrl});
+
+    const body = await request.json();
+    const { caption, imageUrl } = body;
+
+    if (!caption) {
+        return NextResponse.json({ error: "Caption required" }, { status: 400 });
+    }
+
+    const result = await createPost(authorId, { caption, imageUrl });
 
     if (result.error) {
         return NextResponse.json(
@@ -37,6 +46,5 @@ export async function POST(request) {
         );
     }
 
-    return NextResponse.json(result.data,{status:201});
+    return NextResponse.json(result.data, { status: 201 });
 }
-    

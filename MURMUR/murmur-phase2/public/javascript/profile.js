@@ -49,20 +49,6 @@ function fileToDataUrl(file) {
   });
 }
 
-/* ============================================================
-   API WRAPPER  (uses credentials: 'include' to send the cookie)
-============================================================ */
-async function api(path, options = {}) {
-  const res = await fetch(path, {
-    credentials: 'include',
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
-    ...options,
-  });
-  const data = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(data?.error || 'Something went wrong');
-  return data;
-}
-
 
 /* ============================================================
    STATE
@@ -77,8 +63,11 @@ let activePostId = null;
    INIT
 ============================================================ */
 async function init() {
-  const meId = getCookieValue('userId');
-  if (!meId) { window.location.href = 'login.html'; return; }
+  const meId = localStorage.getItem("currentUserId");
+  if (!meId) {
+    window.location.href = "login.html";
+    return;
+  }
 
   try {
     currentUser = await api(`/api/users/${meId}`);
@@ -100,10 +89,10 @@ async function init() {
   renderPosts();
 
 
-  document.getElementById('logout-btn').addEventListener('click', async () => {
-    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => { });
-    window.location.href = 'login.html';
-  });
+  document.getElementById('logout-btn').addEventListener('click', () => {
+  localStorage.removeItem("currentUserId");
+  window.location.href = "login.html";
+});
 
   const searchInput = document.getElementById('search-input');
   const searchResults = document.getElementById('search-results');
@@ -162,10 +151,6 @@ async function init() {
   document.getElementById('cancel-edit-btn').addEventListener('click', hideEditForm);
 }
 
-function getCookieValue(name) {
-  const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-  return match ? decodeURIComponent(match[1]) : null;
-}
 
 
 /* ============================================================
