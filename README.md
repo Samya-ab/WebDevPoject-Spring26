@@ -12,6 +12,8 @@ Aldana Al-mansouri 	202103034
 
 Samya Abadir		 202306611
 
-Amal Nasser 		202103034
+Amal Nasser 		202109024
 
 Nusaibah Zaffer 	202313427
+
+Yara Abu Arji  	201808056

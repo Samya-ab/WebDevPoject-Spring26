@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed · Murmur</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<nav class="mobile-nav">
+    <a href="feed.html">🏠</a>
+    <a href="profile.html">👤</a>
+</nav>
+
+<body class="app-page">
+    <!-- Top navigation -->
+    <header class="app-header">
+        <nav class="app-nav">
+            <a href="feed.html" class="logo"> Murmur </a>
+
+            <!-- Search -->
+            <div class="search-box">
+                <input type="search" class="search-input" id="search-input" placeholder="Search users..."
+                    autocomplete="off">
+                <ul id="search-results" class="search-results" hidden></ul>
+            </div>
+
+            <div class="nav-actions">
+                <a href="profile.html" id="nav-profile-link">Profile
+                    <span id="nav-avatar" class="avatar avatar-sm"></span>
+                </a>
+                <button id="logout-btn">Log out</button>
+            </div>
+
+        </nav>
+
+    </header>
+
+    <!-- 3 Column Layout -->
+    <main class="feed-layout">
+
+        <!-- Left Sidebar -->
+        <aside class="sidebar-left">
+            <div class="sidebar-profile-card">
+                <span id="sidebar-avatar" class="avatar avatar-md"></span>
+                <div class="sidebar-user-info">
+                    <strong id="sidebar-username"></strong>
+                    <span id="sidebar-handle" class="handle"></span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="feed.html" class="sidebar-link active">🏠 Home</a>
+                <a href="profile.html" class="sidebar-link">👤 Profile</a>
+            </nav>
+
+
+        </aside>
+
+
+        <!-- Center feed -->
+        <section class="feed-center">
+
+            <!-- Create post -->
+            <div class="create-post-box">
+                <div class="create-post-top">
+                    <span id="create-post-avatar" class="avatar avatar-sm"></span>
+                    <textarea id="post-content" class="post-textarea" placeholder="What's on your mind?" maxlength="280"
+                        rows="3"></textarea>
+                    <input type="file" id="post-image-file" accept="image/*">
+                </div>
+
+                <div class="create-post-actions">
+                    <span id="char-count" class="char-count">280</span>
+                    <button id="submit-post-btn">Post</button>
+                </div>
+            </div>
+
+            <!-- Feed tabs -->
+            <div class="feed-tabs">
+                <button class="feed-tab active">Following</button>
+                <button class="feed-tab">Everyone</button>
+            </div>
+
+            <!-- Posts will go here -->
+            <div id="posts-container" class="posts-container">
+                <!-- JS WILL RENDER POSTS HERE -->
+            </div>
+
+            <!-- Empty state -->
+            <div id="feed-empty" class="empty-state" hidden>
+                <p>No posts yet. Follow some users or be the first to post!</p>
+            </div>
+
+        </section>
+
+
+        <!-- Right sidebar  -->
+        <aside class="sidebar-right">
+            <div class="who-to-follow">
+                <h3 class="sidebar-heading">Who to Follow</h3>
+                <ul id="suggestions-list" class="suggestions-list">
+                    <!-- JS will render suggested users here -->
+                </ul>
+            </div>
+        </aside>
+
+    </main>
+    <div id="toast"></div>
+    <div id="confirm-modal" class="confirm-overlay">
+        <div class="confirm-box">
+            <h3 id="confirm-title">Confirm action</h3>
+            <p id="confirm-message">Are you sure?</p>
+            <div class="confirm-actions">
+                <button id="confirm-cancel" class="btn btn-secondary" type="button">Cancel</button>
+                <button id="confirm-ok" class="btn btn-primary" type="button">Delete</button>
+            </div>
+        </div>
+    </div>
+    <script src="javascript/api.js"></script>
+    <script src="javascript/feed.js"></script>
+</body>
+
+</html>
